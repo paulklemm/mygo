@@ -1,5 +1,14 @@
 # mygo
 
+<!-- TOC depthFrom:2 -->
+
+- [Examples](#examples)
+- [Installation](#installation)
+- [Restrictions & Data Preparations](#restrictions--data-preparations)
+- [Credits](#credits)
+
+<!-- /TOC -->
+
 Conduct GO-term analysis using [clusterProfiler](https://guangchuangyu.github.io/software/clusterProfiler/) and print report.
 
 ## Examples
@@ -13,6 +22,13 @@ dat <- readxl::read_xlsx('liver_chemogeentic.xlsx') %>%
 dat %>% mygo::createHTMLReport(
   output_path = getwd()
 )
+```
+
+## Installation
+
+```r
+# install.packages('devtools')
+devtools::install_github("paulklemm/mygo")
 ```
 
 ## Restrictions & Data Preparations
