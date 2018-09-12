@@ -1,0 +1,62 @@
+---
+title: Report 2018-06-Lara
+output:
+  html_notebook:
+    toc: yes
+    toc_float: yes
+params:
+  dat: ''
+  dev: 'TRUE'
+  output_path: '.'
+  save_excel: 'TRUE'
+  significance_cutoff: 0.05
+---
+
+# Setup
+
+```{r setup}
+library(mygo)
+library(magrittr)
+library(tibble)
+
+# Debug
+# params <- list()
+# params$dat
+# params$output_path <- '.'
+# params$save_excel <- TRUE
+# params$significance_cutoff <- 0.05
+
+paste0("Settings: dev: ", params$dev, ", output_path: ", params$output_path, ", save_excel: ", params$save_excel, ", significance_cutoff: ", params$significance_cutoff)
+
+print(params$dat)
+
+if (!('q_value' %in% colnames(dat))) {
+  stop('Column `q_value` not found in data frame')
+}
+
+if (!('Symbol' %in% colnames(dat))) {
+  stop('Column `Symbol` not found in data frame')
+}
+
+# Filter significant genes
+
+if (!('EntrezID' %in% colnames(dat))) {
+  warning('EntrezID not available in data frame. Attaching it manually')
+  dat <- params$dat %>% ensembl_to_entrez(ensembl_id_name = "ensembl_gene_id", keep_only_rows_with_entrez = TRUE, drop_duplicates = TRUE)
+  
+  # Get regulated genes that don't have a EntrezID
+  # https://github.sf.mpg.de/bruening-lab/2018-01-Weiyi-Differential-Gene-Expression-Analysis/blob/master/Analysis_DESeq.Rmd
+  print("Regulated genes that do not map to a EntrezID")
+  params$dat %>% dplyr::filter(q_value <= params$significance_cutoff) %>% dplyr::anti_join(dat %>% dplyr::filter(q_value <= params$significance_cutoff), by = "ensembl_gene_id") %>% print()
+}
+```
+
+## GO-Term Analysis
+
+```{r get_go_ontologies, fig.width=10}
+
+# Expect a data set containing q_values and Entrez/Ensembl IDs
+dat_goterms <- dat %>% get_go_all_ontologies(significance_cutoff <- params$significance_cutoff)
+dat_goterms %>% plot_go_terms_all_ontologies()
+dat_goterms %>% export_go_terms_to_excel(paste0(params$output_path, '/go_terms.xlsx'))
+```
