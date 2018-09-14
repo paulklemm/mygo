@@ -2,7 +2,8 @@
 % Please edit documentation in R/tools.R
 \name{export_go_terms_to_excel}
 \alias{export_go_terms_to_excel}
-\title{Export list of GO terms to Excel file}
+\title{Export list of GO terms to Excel file
+TODO: Redo this!}
 \usage{
 export_go_terms_to_excel(ontologies, path)
 }
@@ -13,4 +14,5 @@ export_go_terms_to_excel(ontologies, path)
 }
 \description{
 Export list of GO terms to Excel file
+TODO: Redo this!
 }

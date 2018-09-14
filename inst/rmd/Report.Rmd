@@ -18,10 +18,12 @@ params:
 library(mygo)
 library(magrittr)
 library(tibble)
+library(knitr)
 
 # Debug
 # params <- list()
-# params$dat
+# params$dat <- readxl::read_xlsx('test/liver_chemogeentic.xlsx') %>% dplyr::rename(ensembl_gene_id = EnsemblID, q_value = pValue, fc = FoldChange) %>% dplyr::select(ensembl_gene_id, q_value, Symbol, fc)
+# params$dat <- readr::read_tsv('test/geneexp_F_CPu.tsv') %>% dplyr::rename(fc = `log2(fold_change)`) %>% dplyr::mutate(Symbol = ensembl_gene_id) %>% dplyr::filter(status == "OK") %>% dplyr::select(ensembl_gene_id, q_value, Symbol, fc)
 # params$output_path <- '.'
 # params$save_excel <- TRUE
 # params$significance_cutoff <- 0.05
@@ -30,33 +32,105 @@ paste0("Settings: dev: ", params$dev, ", output_path: ", params$output_path, ", 
 
 print(params$dat)
 
-if (!('q_value' %in% colnames(dat))) {
+if (!('q_value' %in% colnames(params$dat))) {
   stop('Column `q_value` not found in data frame')
-}
-
-if (!('Symbol' %in% colnames(dat))) {
+} else if (!('Symbol' %in% colnames(params$dat))) {
   stop('Column `Symbol` not found in data frame')
+} else if (!('fc' %in% colnames(params$dat))) {
+  stop('Column `fc` not found in data frame')
 }
 
 # Filter significant genes
-
-if (!('EntrezID' %in% colnames(dat))) {
+if (!('EntrezID' %in% colnames(params$dat))) {
   warning('EntrezID not available in data frame. Attaching it manually')
   dat <- params$dat %>% ensembl_to_entrez(ensembl_id_name = "ensembl_gene_id", keep_only_rows_with_entrez = TRUE, drop_duplicates = TRUE)
   
   # Get regulated genes that don't have a EntrezID
   # https://github.sf.mpg.de/bruening-lab/2018-01-Weiyi-Differential-Gene-Expression-Analysis/blob/master/Analysis_DESeq.Rmd
   print("Regulated genes that do not map to a EntrezID")
-  params$dat %>% dplyr::filter(q_value <= params$significance_cutoff) %>% dplyr::anti_join(dat %>% dplyr::filter(q_value <= params$significance_cutoff), by = "ensembl_gene_id") %>% print()
+  params$dat %>%
+    dplyr::filter(q_value <= params$significance_cutoff) %>%
+    dplyr::anti_join(dat %>% dplyr::filter(q_value <= params$significance_cutoff), by = "ensembl_gene_id") %>%
+    kable()
+  
+  print("Check for genes with duplicated entries. We will consider the ones with the lowest p-value")
+  dat %<>% add_is_duplicated("EntrezID")
+  dat %>%
+    dplyr::filter(EntrezID_is_duplicated == T) %>%
+    kable()
+  
+  dat %<>%
+    # For duplicated Entrez IDs only keep the ones with the lowest p-value
+    dplyr::group_by(EntrezID) %>%
+    dplyr::summarize(q_value = min(q_value)) %>%
+    # Join back with the original data set in which we will also remove entries that have the same EntrwzID, q-value and FC
+    # Because it can happen that a EntrezID maps to different Ensembl-IDs
+    dplyr::inner_join(dat %>% dplyr::distinct(EntrezID, q_value, fc, .keep_all = TRUE))
+  # Finally check if we still have problems regarding multiple entries
+  .temp_multiple_entries <- dat %>% add_is_duplicated('EntrezID') %>% dplyr::filter(EntrezID_is_duplicated == T)
+  if (nrow(.temp_multiple_entries) > 0) {
+    warning("Duplicates per EntrezID, check input data")
+    .temp_multiple_entries %>% kable()
+  }
+  # Remove obsolete rows
+  dat %<>% dplyr::select(-EntrezID_is_duplicated)
 }
+# Named double vector of fold changes named after the gene symbol
+fc_symbol <- dat %>% .$fc %>% as.double() %>% `names<-`(dat$Symbol)
 ```
 
-## GO-Term Analysis
+# GO-Term Analysis
 
-```{r get_go_ontologies, fig.width=10}
+## All
 
+```{r get_go_ontologies, fig.width=15}
 # Expect a data set containing q_values and Entrez/Ensembl IDs
 dat_goterms <- dat %>% get_go_all_ontologies(significance_cutoff <- params$significance_cutoff)
-dat_goterms %>% plot_go_terms_all_ontologies()
-dat_goterms %>% export_go_terms_to_excel(paste0(params$output_path, '/go_terms.xlsx'))
+dat_goterms_simplified <- simplify_ontologies(dat_goterms)
+dat_goterms %>% plot_all_ontologies(fc_symbol)
+```
+
+## Simplified
+
+```{r print_go_ontologies, fig.width=15}
+dat_goterms_simplified %>% plot_go_terms_all_ontologies()
+```
+
+
+```{r experiment}
+
+#.temp_dat_filter <- dat %>% dplyr::filter(q_value <= params$significance_cutoff)
+fc_symbol <- dat %>% dplyr::arrange(dplyr::desc(fc)) %>% .$fc %>% as.double() %>% `names<-`(dat$Symbol)
+#dat_goterms$BP %>% enrichplot::heatplot(foldChange = fc)
+dat_goterms$BP %>% clusterProfiler::simplify() %>% enrichplot::heatplot(foldChange = fc_symbol)
+dat_goterms$BP %>% clusterProfiler::cnetplot(foldChange = fc_symbol, circular = TRUE, colorEdge = TRUE)
+
+```
+
+```{r gene_set_enrichment}
+# GO Gene Set Enrichment Analysis
+# https://bioconductor.org/packages/release/bioc/vignettes/clusterProfiler/inst/doc/clusterProfiler.html#go-gene-set-enrichment-analysis
+fc <- dat %>% .$fc %>% as.double() %>% `names<-`(dat$EntrezID)
+fc <- fc[!is.infinite(fc)]
+fc <- fc %>% sort(decreasing = TRUE)
+# dplyr::filter(!is.infinite(fc)) %>% dplyr::arrange(dplyr::desc(fc))
+ego3 <- clusterProfiler::gseGO(geneList = fc,
+  OrgDb        = org.Mm.eg.db,
+  ont          = "BP",
+  nPerm        = 1000,
+  minGSSize    = 100,
+  maxGSSize    = 500,
+  pvalueCutoff = 0.05,
+  verbose      = FALSE
+)
+ego4 <- fc %>% clusterProfiler::gseKEGG(nPerm=10000, organism = 'mmu')
+enrichplot::ridgeplot(ego4)
+enrichplot::ridgeplot(ego3)
+enrichplot::gseaplot(ego3, geneSetID = 1, by = "runningScore")
+```
+
+# TODO: Export result
+
+```{r export_result}
+#dat_goterms %>% export_go_terms_to_excel(paste0(params$output_path, '/go_terms.xlsx'))
 ```

@@ -56,7 +56,7 @@ createHTMLReport <- function(dat, output_path, save_excel = TRUE, significance_c
 
 #' Create clusterProfiler EMA plot from go term
 #'
-#' @import magrittr clusterProfiler ggplot2
+#' @import magrittr clusterProfiler ggplot2 enrichplot
 #' @param go_terms clusterProfiler enrichResult object
 #' @param title ggtitle of the plot
 ema_plot <- function(go_terms, title) {
@@ -71,16 +71,36 @@ ema_plot <- function(go_terms, title) {
 #' Print a series of clusterProfiler plots
 #'
 #' @export
-#' @import magrittr clusterProfiler ggplot2
+#' @import magrittr clusterProfiler ggplot2 enrichplot
 #' @param go_terms clusterProfiler enrichResult object
-plot_gos_normal <- function(go_terms) {
+#' @param fc_symbol double vector containing the fold changes named by symbol
+plot_terms_normal <- function(go_terms, fc_symbol) {
   if (go_terms %>% nrow() == 0) {
     print("No go terms to plot")
     return()
   }
+
+  go_terms %>% enrichplot::heatplot(foldChange = fc_symbol) %>% print()
+  go_terms %>% clusterProfiler::cnetplot(foldChange = fc_symbol, circular = TRUE, colorEdge = TRUE) %>% print()
   plot <- go_terms %>% barplot(showCategory=10) + ggplot2::ggtitle('Barplot of Top10 GO Terms')
   print(plot)
+  go_terms %>% enrichplot::goplot()
   go_terms %>% ema_plot('EMA Plot')
+
+}
+
+#' Simplify GO terms
+#'
+#' @export
+#' @import clusterProfiler magrittr purrr
+#' @param ontologies List of clusterProfiler enrichResult objects with elements BP, MF and CC
+simplify_ontologies <- function(ontologies) {
+  ontologies %>%
+  purrr::map(function(.x) {
+    # Print GO ontology plots
+    .x %>% clusterProfiler::simplify()
+  }) %>%
+    return()
 }
 
 #' Perform a clusterPrfiler enrichGO analysis
@@ -140,17 +160,19 @@ get_go_all_ontologies <- function(dat, significance_cutoff = 0.05) {
 #' @export
 #' @import purrr magrittr
 #' @param ontologies List of clusterProfiler enrichResult objects with elements BP, MF and CC
-plot_go_terms_all_ontologies <- function(ontologies) {
+#' @param fc_symbol double vector containing the fold changes named by symbol
+plot_all_ontologies <- function(ontologies, fc_symbol) {
   ontologies %>%
   purrr::iwalk(function(.x, .y){
     # Print GO ontology
     .y %>% print()
     # Print GO ontology plots
-    .x %>% plot_gos_normal()
+    .x %>% plot_terms_normal(fc_symbol)
   })
 }
 
 #' Export list of GO terms to Excel file
+#' TODO: Redo this!
 #'
 #' @export
 #' @import WriteXLS tibble magrittr
@@ -162,4 +184,77 @@ export_go_terms_to_excel <- function(ontologies, path) {
   CC <- ontologies$CC %>% as.tibble()
   c('BP', 'MF', 'CC') %>%
     WriteXLS::WriteXLS(ExcelFileName = path, AdjWidth = TRUE, AutoFilter = TRUE, BoldHeaderRow = TRUE, FreezeRow = 1, SheetNames = c('Biological Processes', 'Molecular Function', 'Cellular Component'))
+}
+
+#' Get named fc vector. Prepare input data as required by GSE
+#'
+#' @export
+#' @import magrittr clusterProfiler
+#' @param dat Dataframe with columns `EntrezID` and `fc`
+get_named_fc_vector <- function(dat) {
+  # https://bioconductor.org/packages/release/bioc/vignettes/clusterProfiler/inst/doc/clusterProfiler.html#go-gene-set-enrichment-analysis
+  fc <- dat %>% .$fc %>% as.double() %>% `names<-`(dat$EntrezID)
+  fc <- fc[!is.infinite(fc)]
+  fc <- fc %>% sort(decreasing = TRUE)
+  fc %>% return()
+}
+
+#' Get GSE-terms for all ontologies
+#'
+#' @import magrittr dplyr
+#' @export
+#' @param dat Data frame containing columns `pValue` and `EntrezID`
+get_gse_all_ontologies <- function(dat) {
+  # Prepare input data as required by GSE
+  fc <- dat %>% get_named_fc_vector()
+  gse_terms <- list()
+  gse_terms$BP <- entrezgenes %>% perform_gseGO(fc = 'BP')
+  gse_terms$MF <- entrezgenes %>% perform_gseGO(fc = 'MF')
+  gse_terms$CC <- entrezgenes %>% perform_gseGO(fc = 'CC')
+  gse_terms %>% return()
+}
+
+#' Get KEGG terms for all ontologies
+#'
+#' @import magrittr dplyr
+#' @export
+#' @param dat Data frame containing columns `pValue` and `EntrezID`
+get_kegg_all_ontologies <- function(dat) {
+  # Prepare input data as required by GSE
+  fc <- dat %>% get_named_fc_vector()
+  kegg_terms <- list()
+  kegg_terms$BP <- entrezgenes %>% perform_gseKEGG(fc = 'BP')
+  kegg_terms$MF <- entrezgenes %>% perform_gseKEGG(fc = 'MF')
+  kegg_terms$CC <- entrezgenes %>% perform_gseKEGG(fc = 'CC')
+  kegg_terms %>% return()
+}
+
+#' Perform a clusterProfiler gseGO analysis
+#'
+#' @export
+#' @import magrittr clusterProfiler org.Mm.eg.db
+#' @param ontoloty Can be either "BP", "CC", "MF"
+#' @param fc Named vector of foldchanges (name denotes Entrez ID)
+perform_gseGO <- function(ontology, fc) {
+  clusterProfiler::gseGO(geneList = fc,
+    OrgDb        = org.Mm.eg.db,
+    ont          = ontology,
+    nPerm        = 1000,
+    minGSSize    = 100,
+    maxGSSize    = 500,
+    pvalueCutoff = 0.05,
+    verbose      = FALSE
+  ) %>%
+    return()
+}
+
+#' Perform a clusterProfiler gseKEGG analysis
+#'
+#' @export
+#' @import magrittr clusterProfiler
+#' @param ontoloty Can be either "BP", "CC", "MF"
+#' @param fc Named vector of foldchanges (name denotes Entrez ID)
+perform_gseKEGG <- function(ontology, fc) {
+  clusterProfiler::gseKEGG(nPerm=10000, organism = 'mmu') %>%
+    return()
 }
