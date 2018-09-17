@@ -34,8 +34,6 @@ print(params$dat)
 
 if (!('q_value' %in% colnames(params$dat))) {
   stop('Column `q_value` not found in data frame')
-} else if (!('Symbol' %in% colnames(params$dat))) {
-  stop('Column `Symbol` not found in data frame')
 } else if (!('fc' %in% colnames(params$dat))) {
   stop('Column `fc` not found in data frame')
 }
@@ -98,41 +96,30 @@ dat_goterms %>% plot_all_ontologies(fc_symbol)
 dat_goterms_simplified %>% plot_go_terms_all_ontologies()
 ```
 
+# Gene Set Enrichment GO Analysis
 
-```{r experiment}
-
-#.temp_dat_filter <- dat %>% dplyr::filter(q_value <= params$significance_cutoff)
-fc_symbol <- dat %>% dplyr::arrange(dplyr::desc(fc)) %>% .$fc %>% as.double() %>% `names<-`(dat$Symbol)
-#dat_goterms$BP %>% enrichplot::heatplot(foldChange = fc)
-dat_goterms$BP %>% clusterProfiler::simplify() %>% enrichplot::heatplot(foldChange = fc_symbol)
-dat_goterms$BP %>% clusterProfiler::cnetplot(foldChange = fc_symbol, circular = TRUE, colorEdge = TRUE)
-
+```{r gse_all, fig.width=15}
+dat_gse_go <- dat %>% get_gse_all_ontologies()
+dat_gse_go %>% plot_all_ontologies(fc_symbol)
 ```
 
-```{r gene_set_enrichment}
-# GO Gene Set Enrichment Analysis
-# https://bioconductor.org/packages/release/bioc/vignettes/clusterProfiler/inst/doc/clusterProfiler.html#go-gene-set-enrichment-analysis
-fc <- dat %>% .$fc %>% as.double() %>% `names<-`(dat$EntrezID)
-fc <- fc[!is.infinite(fc)]
-fc <- fc %>% sort(decreasing = TRUE)
-# dplyr::filter(!is.infinite(fc)) %>% dplyr::arrange(dplyr::desc(fc))
-ego3 <- clusterProfiler::gseGO(geneList = fc,
-  OrgDb        = org.Mm.eg.db,
-  ont          = "BP",
-  nPerm        = 1000,
-  minGSSize    = 100,
-  maxGSSize    = 500,
-  pvalueCutoff = 0.05,
-  verbose      = FALSE
-)
-ego4 <- fc %>% clusterProfiler::gseKEGG(nPerm=10000, organism = 'mmu')
-enrichplot::ridgeplot(ego4)
-enrichplot::ridgeplot(ego3)
-enrichplot::gseaplot(ego3, geneSetID = 1, by = "runningScore")
+# Gene Set Enrichtment KEGG Pathways
+
+```{r gse_kegg_all, fig.width=15}
+dat_gse_kegg <- dat %>% get_kegg_all_ontologies()
+dat_gse_kegg %>% plot_all_ontologies(fc_symbol)
 ```
 
-# TODO: Export result
+# Export Result
 
 ```{r export_result}
-#dat_goterms %>% export_go_terms_to_excel(paste0(params$output_path, '/go_terms.xlsx'))
+if (parms$save_excel) {
+  export_go_terms_to_excel(
+    go_ontologies        = dat_goterms,
+    go_ontologies_simple = dat_goterms_simplified,
+    gse_ontologies       = dat_gse_go,
+    kegg_ontologies      = dat_gse_kegg,
+    path                 = paste0(params$output_path, '/go_terms.xlsx')
+  )
+}
 ```

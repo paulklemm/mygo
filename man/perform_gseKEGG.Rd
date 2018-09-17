@@ -4,12 +4,10 @@
 \alias{perform_gseKEGG}
 \title{Perform a clusterProfiler gseKEGG analysis}
 \usage{
-perform_gseKEGG(ontology, fc)
+perform_gseKEGG(fc)
 }
 \arguments{
 \item{fc}{Named vector of foldchanges (name denotes Entrez ID)}
-
-\item{ontoloty}{Can be either "BP", "CC", "MF"}
 }
 \description{
 Perform a clusterProfiler gseKEGG analysis

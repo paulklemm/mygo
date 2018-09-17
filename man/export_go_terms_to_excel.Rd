@@ -5,10 +5,17 @@
 \title{Export list of GO terms to Excel file
 TODO: Redo this!}
 \usage{
-export_go_terms_to_excel(ontologies, path)
+export_go_terms_to_excel(go_ontologies, go_ontologies_simple,
+  gse_ontologies, kegg_ontologies, path)
 }
 \arguments{
-\item{ontologies}{List of clusterProfiler enrichResult objects with elements BP, MF and CC}
+\item{go_ontologies}{List of clusterProfiler enrichResult objects with elements BP, MF and CC}
+
+\item{go_ontologies_simple}{List of clusterProfiler enrichResult objects with elements BP, MF and CC after being simplified}
+
+\item{gse_ontologies}{GSE enrichResult}
+
+\item{kegg_ontologies}{KEGG enrichResult}
 
 \item{path}{Path to exported excel file}
 }

@@ -76,12 +76,12 @@ createHTMLReport <- function(dat, output_path, save_excel = TRUE, significance_c
 #' @import magrittr clusterProfiler ggplot2 enrichplot
 #' @param go_terms clusterProfiler enrichResult object
 #' @param title ggtitle of the plot
-ema_plot <- function(go_terms, title) {
+emap_plot <- function(go_terms, title) {
   # There is a bug with very small GO term selections that we have to catch
   # HACK
   if (go_terms %>% nrow() > 2) {
     plot <- go_terms %>% enrichplot::emapplot() + ggplot2::ggtitle(title)  
-    print(plot)
+    return(plot)
   }
 }
 
@@ -91,19 +91,45 @@ ema_plot <- function(go_terms, title) {
 #' @import magrittr clusterProfiler ggplot2 enrichplot
 #' @param go_terms clusterProfiler enrichResult object
 #' @param fc_symbol double vector containing the fold changes named by symbol
-plot_terms_normal <- function(go_terms, fc_symbol) {
+plot_terms_go <- function(go_terms, fc_symbol) {
   if (go_terms %>% nrow() == 0) {
     print("No go terms to plot")
     return()
   }
-
   go_terms %>% enrichplot::heatplot(foldChange = fc_symbol) %>% print()
-  go_terms %>% clusterProfiler::cnetplot(foldChange = fc_symbol, circular = TRUE, colorEdge = TRUE) %>% print()
+  #go_terms %>% clusterProfiler::cnetplot(foldChange = fc_symbol, circular = TRUE, colorEdge = TRUE) %>% print()
   plot <- go_terms %>% barplot(showCategory=10) + ggplot2::ggtitle('Barplot of Top10 GO Terms')
   print(plot)
-  go_terms %>% enrichplot::goplot()
-  go_terms %>% ema_plot('EMA Plot')
+  go_terms %>% enrichplot::goplot() %>% print()
+  go_terms %>% emap_plot('Enrich Map Plot Plot') %>% print()
+}
 
+#' Plot GSE terms
+#'
+#' @export
+#' @import clusterProfiler ggplot2
+#' @param gse_terms clusterProfiler gse terms object
+#' @param fc_symbol double vector containing the fold changes named by symbol
+plot_terms_gse <- function(gse_terms, fc_symbol) {
+  if (gse_terms %>% nrow() == 0) {
+    print("No go terms to plot")
+    return()
+  }
+  gse_terms %>%
+    enrichplot::emapplot() %>%
+    print()
+  gse_terms %>%
+    enrichplot::heatplot(foldChange = fc_symbol) %>%
+    print()
+  gse_terms %>%
+    enrichplot::gseaplot(geneSetID = 1) %>%
+    print()
+  gse_terms %>%
+    enrichplot::cnetplot(foldChange = fc_symbol, circular = TRUE, colorEdge = TRUE) %>%
+    print()
+  gse_terms %>%
+    enrichplot::ridgeplot() %>%
+    print()
 }
 
 #' Simplify GO terms
@@ -184,7 +210,11 @@ plot_all_ontologies <- function(ontologies, fc_symbol) {
     # Print GO ontology
     .y %>% print()
     # Print GO ontology plots
-    .x %>% plot_terms_normal(fc_symbol)
+    if (.x %>% .hasSlot("setType")) {
+      .x %>% plot_terms_gse(fc_symbol)
+    } else {
+      .x %>% plot_terms_go(fc_symbol)
+    }
   })
 }
 
@@ -193,14 +223,31 @@ plot_all_ontologies <- function(ontologies, fc_symbol) {
 #'
 #' @export
 #' @import WriteXLS tibble magrittr
-#' @param ontologies List of clusterProfiler enrichResult objects with elements BP, MF and CC
+#' @param go_ontologies List of clusterProfiler enrichResult objects with elements BP, MF and CC
+#' @param go_ontologies_simple List of clusterProfiler enrichResult objects with elements BP, MF and CC after being simplified
+#' @param gse_ontologies GSE enrichResult
+#' @param kegg_ontologies KEGG enrichResult
 #' @param path Path to exported excel file
-export_go_terms_to_excel <- function(ontologies, path) {
-  BP <- ontologies$BP %>% as.tibble()
-  MF <- ontologies$MF %>% as.tibble()
-  CC <- ontologies$CC %>% as.tibble()
-  c('BP', 'MF', 'CC') %>%
-    WriteXLS::WriteXLS(ExcelFileName = path, AdjWidth = TRUE, AutoFilter = TRUE, BoldHeaderRow = TRUE, FreezeRow = 1, SheetNames = c('Biological Processes', 'Molecular Function', 'Cellular Component'))
+export_go_terms_to_excel <- function(go_ontologies, go_ontologies_simple, gse_ontologies, kegg_ontologies, path) {
+  BP_go <- go_ontologies$BP %>% as.tibble()
+  MF_go <- go_ontologies$MF %>% as.tibble()
+  CC_go <- go_ontologies$CC %>% as.tibble()
+  BP_go_simple <- go_ontologies_simple$BP %>% as.tibble()
+  MF_go_simple <- go_ontologies_simple$MF %>% as.tibble()
+  CC_go_simple <- go_ontologies_simple$CC %>% as.tibble()
+  BP_gse <- gse_ontologies$BP %>% as.tibble()
+  MF_gse <- gse_ontologies$MF %>% as.tibble()
+  CC_gse <- gse_ontologies$CC %>% as.tibble()
+  kegg_gse <- kegg_ontologies$kegg %>% as.tibble()
+
+  c('BP_go', 'MF_go', 'CC_go', 'BP_go_simple', 'MF_go_simple', 'CC_go_simple', 'BP_gse', 'MF_gse', 'CC_gse', 'KEGG_gse') %>%
+    WriteXLS::WriteXLS(ExcelFileName = path,
+      AdjWidth = TRUE,
+      AutoFilter = TRUE,
+      BoldHeaderRow = TRUE,
+      FreezeRow = 1,
+      SheetNames = c('GO Biological Processes', 'GO Molecular Function', 'GO Cellular Component', 'GO Simple Biological Processes', 'GO Simple Molecular Function', 'GO Simple Cellular Component', 'GSE Biological Processes', 'GSE Molecular Function', 'GSE Cellular Component', 'GSE KEGG')
+    )
 }
 
 #' Get named fc vector. Prepare input data as required by GSE
@@ -225,9 +272,9 @@ get_gse_all_ontologies <- function(dat) {
   # Prepare input data as required by GSE
   fc <- dat %>% get_named_fc_vector()
   gse_terms <- list()
-  gse_terms$BP <- entrezgenes %>% perform_gseGO(fc = 'BP')
-  gse_terms$MF <- entrezgenes %>% perform_gseGO(fc = 'MF')
-  gse_terms$CC <- entrezgenes %>% perform_gseGO(fc = 'CC')
+  gse_terms$BP <- perform_gseGO(ontology = 'BP', fc = fc)
+  gse_terms$MF <- perform_gseGO(ontology = 'MF', fc = fc)
+  gse_terms$CC <- perform_gseGO(ontology = 'CC', fc = fc)
   gse_terms %>% return()
 }
 
@@ -240,16 +287,14 @@ get_kegg_all_ontologies <- function(dat) {
   # Prepare input data as required by GSE
   fc <- dat %>% get_named_fc_vector()
   kegg_terms <- list()
-  kegg_terms$BP <- entrezgenes %>% perform_gseKEGG(fc = 'BP')
-  kegg_terms$MF <- entrezgenes %>% perform_gseKEGG(fc = 'MF')
-  kegg_terms$CC <- entrezgenes %>% perform_gseKEGG(fc = 'CC')
+  kegg_terms$kegg <- perform_gseKEGG(fc = fc)
   kegg_terms %>% return()
 }
 
 #' Perform a clusterProfiler gseGO analysis
 #'
 #' @export
-#' @import magrittr clusterProfiler org.Mm.eg.db
+#' @import magrittr clusterProfiler org.Mm.eg.db DOSE
 #' @param ontoloty Can be either "BP", "CC", "MF"
 #' @param fc Named vector of foldchanges (name denotes Entrez ID)
 perform_gseGO <- function(ontology, fc) {
@@ -262,16 +307,16 @@ perform_gseGO <- function(ontology, fc) {
     pvalueCutoff = 0.05,
     verbose      = FALSE
   ) %>%
+    DOSE::setReadable(OrgDb = org.Mm.eg.db) %>%
     return()
 }
 
 #' Perform a clusterProfiler gseKEGG analysis
 #'
 #' @export
-#' @import magrittr clusterProfiler
-#' @param ontoloty Can be either "BP", "CC", "MF"
+#' @import magrittr clusterProfiler DOSE
 #' @param fc Named vector of foldchanges (name denotes Entrez ID)
-perform_gseKEGG <- function(ontology, fc) {
-  clusterProfiler::gseKEGG(nPerm=10000, organism = 'mmu') %>%
+perform_gseKEGG <- function(fc) {
+  fc %>% clusterProfiler::gseKEGG(nPerm=10000, organism = 'mmu') %>%
     return()
 }

@@ -14,10 +14,13 @@ Conduct GO-term analysis using [clusterProfiler](https://guangchuangyu.github.io
 ## Examples
 
 ```R
+library(tidyverse)
 # Create data frame that fits the need of the analysis
-dat <- readxl::read_xlsx('liver_chemogeentic.xlsx') %>%
-  dplyr::rename(ensembl_gene_id = EnsemblID, q_value = pValue) %>%
-  dplyr::select(ensembl_gene_id, q_value, Symbol)
+dat <- readr::read_tsv('test/geneexp_F_CPu.tsv') %>%
+  dplyr::rename(fc = `log2(fold_change)`) %>%
+  dplyr::mutate(Symbol = ensembl_gene_id) %>%
+  dplyr::filter(status == "OK") %>%
+  dplyr::select(ensembl_gene_id, q_value, fc)
 
 dat %>% mygo::createHTMLReport(
   output_path = getwd()
