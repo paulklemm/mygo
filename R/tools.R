@@ -28,6 +28,23 @@ ensembl_to_entrez <- function(dat, ensembl_id_name, keep_only_rows_with_entrez =
   }
 }
 
+#' Add Gene Symbol from EntrezID
+#'
+#' @export
+#' @import clusterProfiler dplyr magrittr
+#' @param dat data frame with EnzrezID
+attach_gene_symbol_from_entrez <- function(dat) {
+  if (!('EntrezID' %in% colnames(dat))) {
+    stop('EntrezID not available in data frame')
+  }
+
+  dat["EntrezID"][[1]] %>% clusterProfiler::bitr(fromType = "ENTREZID", toType = c("SYMBOL"), OrgDb = org.Mm.eg.db) %>%
+    dplyr::rename(EntrezID = ENTREZID, Symbol = SYMBOL) %>%
+    dplyr::right_join(dat) %>%
+    as.tibble() %>%
+    return()
+}
+
 #' Make GO-Term analysis and print out Report
 #'
 #' @export

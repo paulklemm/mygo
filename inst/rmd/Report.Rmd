@@ -21,9 +21,9 @@ library(tibble)
 library(knitr)
 
 # Debug
-# params <- list()
 # params$dat <- readxl::read_xlsx('test/liver_chemogeentic.xlsx') %>% dplyr::rename(ensembl_gene_id = EnsemblID, q_value = pValue, fc = FoldChange) %>% dplyr::select(ensembl_gene_id, q_value, Symbol, fc)
-# params$dat <- readr::read_tsv('test/geneexp_F_CPu.tsv') %>% dplyr::rename(fc = `log2(fold_change)`) %>% dplyr::mutate(Symbol = ensembl_gene_id) %>% dplyr::filter(status == "OK") %>% dplyr::select(ensembl_gene_id, q_value, Symbol, fc)
+# params <- list()
+# params$dat <- readr::read_tsv('test/geneexp_F_CPu.tsv') %>% dplyr::rename(fc = `log2(fold_change)`) %>% dplyr::mutate(Symbol = ensembl_gene_id) %>% dplyr::filter(status == "OK") %>% dplyr::select(ensembl_gene_id, q_value, fc)
 # params$output_path <- '.'
 # params$save_excel <- TRUE
 # params$significance_cutoff <- 0.05
@@ -75,6 +75,8 @@ if (!('EntrezID' %in% colnames(params$dat))) {
   # Remove obsolete rows
   dat %<>% dplyr::select(-EntrezID_is_duplicated)
 }
+# Get names vector from EntrezIDs
+dat %<>% attach_gene_symbol_from_entrez()
 # Named double vector of fold changes named after the gene symbol
 fc_symbol <- dat %>% .$fc %>% as.double() %>% `names<-`(dat$Symbol)
 ```
