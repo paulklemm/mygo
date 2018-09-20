@@ -1,5 +1,5 @@
 ---
-title: Report 2018-06-Lara
+title: GO-Term Analysis
 output:
   html_notebook:
     toc: yes
@@ -83,7 +83,7 @@ fc_symbol <- dat %>% .$fc %>% as.double() %>% `names<-`(dat$Symbol)
 
 ## All
 
-```{r get_go_ontologies, fig.width=15}
+```{r get_go_ontologies, dev='svg', fig.width=15}
 # Expect a data set containing q_values and Entrez/Ensembl IDs
 dat_goterms <- dat %>% get_go_all_ontologies(significance_cutoff <- params$significance_cutoff)
 dat_goterms_simplified <- simplify_ontologies(dat_goterms)
@@ -92,20 +92,20 @@ dat_goterms %>% plot_all_ontologies(fc_symbol)
 
 ## Simplified
 
-```{r print_go_ontologies, fig.width=15}
-dat_goterms_simplified %>% plot_go_terms_all_ontologies()
+```{r print_go_ontologies, dev='svg', fig.width=15}
+dat_goterms_simplified %>% plot_all_ontologies(fc_symbol)
 ```
 
 # Gene Set Enrichment GO Analysis
 
-```{r gse_all, fig.width=15}
+```{r gse_all, dev='svg', fig.width=15}
 dat_gse_go <- dat %>% get_gse_all_ontologies()
 dat_gse_go %>% plot_all_ontologies(fc_symbol)
 ```
 
 # Gene Set Enrichtment KEGG Pathways
 
-```{r gse_kegg_all, fig.width=15}
+```{r gse_kegg_all, dev='svg', fig.width=15}
 dat_gse_kegg <- dat %>% get_kegg_all_ontologies()
 dat_gse_kegg %>% plot_all_ontologies(fc_symbol)
 ```
@@ -113,7 +113,7 @@ dat_gse_kegg %>% plot_all_ontologies(fc_symbol)
 # Export Result
 
 ```{r export_result}
-if (parms$save_excel) {
+if (params$save_excel) {
   export_go_terms_to_excel(
     go_ontologies        = dat_goterms,
     go_ontologies_simple = dat_goterms_simplified,

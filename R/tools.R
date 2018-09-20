@@ -240,7 +240,7 @@ export_go_terms_to_excel <- function(go_ontologies, go_ontologies_simple, gse_on
   CC_gse <- gse_ontologies$CC %>% as.tibble()
   kegg_gse <- kegg_ontologies$kegg %>% as.tibble()
 
-  c('BP_go', 'MF_go', 'CC_go', 'BP_go_simple', 'MF_go_simple', 'CC_go_simple', 'BP_gse', 'MF_gse', 'CC_gse', 'KEGG_gse') %>%
+  c('BP_go', 'MF_go', 'CC_go', 'BP_go_simple', 'MF_go_simple', 'CC_go_simple', 'BP_gse', 'MF_gse', 'CC_gse', 'kegg_gse') %>%
     WriteXLS::WriteXLS(ExcelFileName = path,
       AdjWidth = TRUE,
       AutoFilter = TRUE,
