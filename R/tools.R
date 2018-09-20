@@ -168,13 +168,13 @@ perform_enrichGO <- function(ontology, entrezgenes) {
 #' @import ggplot2 ggrepel
 #' @param go_terms clusterProfiler enrichResult object
 volcano_plot <- function(dat, label_top_n = 20) {
-  dat %<>% mutate(Significant = pValue <= 0.05)
+  dat %<>% mutate(Significant = q_value <= 0.05)
   plot <- dat %>%
-    ggplot2::ggplot(aes(FoldChange, -log10(pValue))) +
+    ggplot2::ggplot(aes(fc, -log10(q_value))) +
     ggplot2::geom_point(aes(color = Significant)) +
     ggplot2::scale_color_manual(values = c("grey", "red")) +
     ggrepel::geom_text_repel(
-        data = dat %>% filter(Significant == TRUE) %>% arrange(pValue) %>% head(label_top_n),
+        data = dat %>% filter(Significant == TRUE) %>% arrange(q_value) %>% head(label_top_n),
         aes(label = Symbol)
       )
   return(plot)

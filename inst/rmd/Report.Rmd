@@ -81,6 +81,12 @@ dat %<>% attach_gene_symbol_from_entrez()
 fc_symbol <- dat %>% .$fc %>% as.double() %>% `names<-`(dat$Symbol)
 ```
 
+# Volcano Plot
+
+```{r volcano_plot, dev='svg', fig.width=15}
+dat %>% volcano_plot()
+```
+
 # GO-Term Analysis
 
 ## All
