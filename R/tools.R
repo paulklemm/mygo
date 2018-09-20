@@ -272,6 +272,8 @@ get_gse_all_ontologies <- function(dat) {
   # Prepare input data as required by GSE
   fc <- dat %>% get_named_fc_vector()
   gse_terms <- list()
+  # Barplot of the fold change
+  fc %>% barplot()
   gse_terms$BP <- perform_gseGO(ontology = 'BP', fc = fc)
   gse_terms$MF <- perform_gseGO(ontology = 'MF', fc = fc)
   gse_terms$CC <- perform_gseGO(ontology = 'CC', fc = fc)

@@ -21,12 +21,14 @@ library(tibble)
 library(knitr)
 
 # Debug
-# params$dat <- readxl::read_xlsx('test/liver_chemogeentic.xlsx') %>% dplyr::rename(ensembl_gene_id = EnsemblID, q_value = pValue, fc = FoldChange) %>% dplyr::select(ensembl_gene_id, q_value, Symbol, fc)
-# params <- list()
-# params$dat <- readr::read_tsv('test/geneexp_F_CPu.tsv') %>% dplyr::rename(fc = `log2(fold_change)`) %>% dplyr::mutate(Symbol = ensembl_gene_id) %>% dplyr::filter(status == "OK") %>% dplyr::select(ensembl_gene_id, q_value, fc)
-# params$output_path <- '.'
-# params$save_excel <- TRUE
-# params$significance_cutoff <- 0.05
+# DEBUG Statements
+if (!exists('params')) {
+  params <- list()
+  params$dat <- readr::read_tsv('test/geneexp_F_CPu.tsv') %>% dplyr::rename(fc = `log2(fold_change)`) %>% dplyr::mutate(Symbol = ensembl_gene_id) %>% dplyr::filter(status == "OK") %>% dplyr::select(ensembl_gene_id, q_value, fc)
+  params$output_path <- '.'
+  params$save_excel <- TRUE
+  params$significance_cutoff <- 0.05
+}
 
 paste0("Settings: dev: ", params$dev, ", output_path: ", params$output_path, ", save_excel: ", params$save_excel, ", significance_cutoff: ", params$significance_cutoff)
 
