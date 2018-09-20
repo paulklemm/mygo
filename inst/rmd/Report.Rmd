@@ -4,6 +4,7 @@ output:
   html_notebook:
     toc: yes
     toc_float: yes
+    code_folding: hide
 params:
   dat: ''
   dev: 'TRUE'
