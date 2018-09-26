@@ -14,7 +14,7 @@ Conduct GO-term analysis using [clusterProfiler](https://guangchuangyu.github.io
 ## Examples
 
 ```R
-library(tidyverse)
+library(magrittr)
 # Create data frame that fits the need of the analysis
 dat <- readr::read_tsv('test/geneexp_F_CPu.tsv') %>%
   dplyr::rename(fc = `log2(fold_change)`) %>%
@@ -23,7 +23,7 @@ dat <- readr::read_tsv('test/geneexp_F_CPu.tsv') %>%
   dplyr::select(ensembl_gene_id, q_value, fc)
 
 dat %>% mygo::createHTMLReport(
-  output_path = getwd()
+  output_path = file.path(getwd(), 'result')
 )
 ```
 

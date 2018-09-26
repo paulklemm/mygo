@@ -24,4 +24,5 @@ Imports:
     WriteXLS,
     tibble,
     rmarkdown,
-    enrichplot
+    enrichplot,
+    radix

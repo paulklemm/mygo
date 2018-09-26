@@ -58,7 +58,7 @@ createHTMLReport <- function(dat, output_path, save_excel = TRUE, significance_c
   # https://stackoverflow.com/questions/30377213/how-to-include-rmarkdown-file-in-r-package
   path_to_report <- system.file("rmd/Report.Rmd", package="mygo")
   # Render the document and put it into the output dir
-  render(path_to_report, intermediates_dir = output_path, params = list(
+  render(path_to_report, params = list(
     dat = dat,
     output_path = output_path,
     save_excel = save_excel,
@@ -280,12 +280,12 @@ get_gse_all_ontologies <- function(dat) {
   gse_terms %>% return()
 }
 
-#' Get KEGG terms for all ontologies
+#' Get KEGG GSE terms
 #'
 #' @import magrittr dplyr
 #' @export
 #' @param dat Data frame containing columns `pValue` and `EntrezID`
-get_kegg_all_ontologies <- function(dat) {
+get_kegg <- function(dat) {
   # Prepare input data as required by GSE
   fc <- dat %>% get_named_fc_vector()
   kegg_terms <- list()
