@@ -125,7 +125,7 @@ Also called GO-over represenation test.
 
 ```{r get_go_ontologies, dev='svg', layout="l-page"}
 # Expect a data set containing q_values and Entrez/Ensembl IDs
-dat_goterms <- dat %>% get_go_all_ontologies(significance_cutoff <- params$significance_cutoff)
+dat_goterms <- dat %>% get_go_all_ontologies(significance_cutoff = params$significance_cutoff)
 dat_goterms_simplified <- simplify_ontologies(dat_goterms)
 dat_goterms %>% plot_all_ontologies(fc_symbol)
 ```

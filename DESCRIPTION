@@ -25,4 +25,5 @@ Imports:
     tibble,
     rmarkdown,
     enrichplot,
-    radix
+    radix,
+    plotly

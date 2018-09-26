@@ -88,7 +88,7 @@ emap_plot <- function(go_terms, title) {
 #' Print a series of clusterProfiler plots
 #'
 #' @export
-#' @import magrittr clusterProfiler ggplot2 enrichplot
+#' @import magrittr clusterProfiler ggplot2 enrichplot plotly
 #' @param go_terms clusterProfiler enrichResult object
 #' @param fc_symbol double vector containing the fold changes named by symbol
 plot_terms_go <- function(go_terms, fc_symbol) {
@@ -96,10 +96,10 @@ plot_terms_go <- function(go_terms, fc_symbol) {
     print("No go terms to plot")
     return()
   }
-  go_terms %>% enrichplot::heatplot(foldChange = fc_symbol) %>% print()
+  go_terms %>% enrichplot::heatplot(foldChange = fc_symbol) %>% plotly::ggplotly() %>% print()
   #go_terms %>% clusterProfiler::cnetplot(foldChange = fc_symbol, circular = TRUE, colorEdge = TRUE) %>% print()
   plot <- go_terms %>% barplot(showCategory=10) + ggplot2::ggtitle('Barplot of Top10 GO Terms')
-  print(plot)
+  plotly::ggplotly(plot)
   go_terms %>% enrichplot::goplot() %>% print()
   go_terms %>% emap_plot('Enrich Map Plot Plot') %>% print()
 }
@@ -120,6 +120,7 @@ plot_terms_gse <- function(gse_terms, fc_symbol) {
     print()
   gse_terms %>%
     enrichplot::heatplot(foldChange = fc_symbol) %>%
+    plotly::ggplotly() %>%
     print()
   gse_terms %>%
     enrichplot::gseaplot(geneSetID = 1) %>%
