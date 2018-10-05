@@ -1,5 +1,7 @@
 # mygo
 
+---
+
 <!-- TOC depthFrom:2 -->
 
 - [Examples](#examples)
@@ -8,6 +10,8 @@
 - [Credits](#credits)
 
 <!-- /TOC -->
+
+---
 
 Conduct GO-term analysis using [clusterProfiler](https://guangchuangyu.github.io/software/clusterProfiler/) and print report.
 
@@ -21,9 +25,14 @@ dat <- readr::read_tsv('test/geneexp_F_CPu.tsv') %>%
   dplyr::mutate(Symbol = ensembl_gene_id) %>%
   dplyr::filter(status == "OK") %>%
   dplyr::select(ensembl_gene_id, q_value, fc)
-
+# Standard Mode
 dat %>% mygo::createHTMLReport(
-  output_path = file.path(getwd(), 'result')
+  output_path = file.path(getwd(), 'result'),
+)
+# Debug Mode
+dat %>% mygo::createHTMLReport(
+  output_path = file.path(getwd(), 'result'),
+  dev = TRUE
 )
 ```
 

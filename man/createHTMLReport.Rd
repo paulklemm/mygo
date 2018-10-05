@@ -5,7 +5,7 @@
 \title{Make GO-Term analysis and print out Report}
 \usage{
 createHTMLReport(dat, output_path, save_excel = TRUE,
-  significance_cutoff = 0.05)
+  significance_cutoff = 0.05, dev = FALSE)
 }
 \arguments{
 \item{dat}{Dataframe containing variables \code{q_value} and \code{EntrezID} or \code{EnsemblID}}

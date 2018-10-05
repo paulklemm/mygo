@@ -1,22 +1,15 @@
 ---
 title: GO-Term Analysis
-description: |
-  GO-Term, KEGG Pathway and Gene Set Enrichement Analysis using clusterProfiler
-author:
-  - name: MYGO
-    url: https://github.com/paulklemm/mygo
-    affiliation: Max Planck Institute for Metabolism Research
-    affiliation_url: http://www.sf.mpg.de/en
 date: "`r Sys.Date()`"
 output:
-  radix::radix_article:
-    toc: true
-    toc_depth: 2
+  flexdashboard::flex_dashboard:
     fig_width: 12
+    toc_float: yes
+    code_folding: hide
     fig_height: 8
 params:
   dat: ''
-  dev: 'TRUE'
+  dev: 'FALSE'
   output_path: '.'
   save_excel: 'TRUE'
   significance_cutoff: 0.05
@@ -24,9 +17,11 @@ params:
 
 # Overview
 
+## Column {.tabset}
+
 Conduct GO-term analysis using [clusterProfiler](https://guangchuangyu.github.io/software/clusterProfiler/) and print report.
 
-## Restrictions & Data Preparations
+### Restrictions & Data Preparations
 
 Currently only `mus musculus` datasets are supported.
 
@@ -103,15 +98,19 @@ dat %<>% attach_gene_symbol_from_entrez()
 fc_symbol <- dat %>% .$fc %>% as.double() %>% `names<-`(dat$Symbol)
 ```
 
-# Volcano Plot
+### Volcano Plot
 
 To get a general feeling for the data we plot the differential expression analysis result as Volcano Plot.
 
-```{r volcano_plot, dev='svg', layout="l-page"}
+```{r volcano_plot, dev='svg'}
 dat %>% volcano_plot()
 ```
 
 # GO-Term Analysis
+
+## Column {.tabset}
+
+### Overview
 
 Also called GO-over represenation test.
 
@@ -121,41 +120,53 @@ Also called GO-over represenation test.
   * Hypergeometric distribution is a distribution modelling normally distributed probabilities (e.g. red, blue and green marbles in a Urn) -- [Wiki](https://de.wikipedia.org/wiki/Hypergeometrische_Verteilung)
   * Freely spoken, DOSE determines whether any terms annotated by the list of differentially expressed genes is greater than the one expected by chance in a term
 
-## All
+### All
 
-```{r get_go_ontologies, dev='svg', layout="l-page"}
-# Expect a data set containing q_values and Entrez/Ensembl IDs
-dat_goterms <- dat %>% get_go_all_ontologies(significance_cutoff = params$significance_cutoff)
-dat_goterms_simplified <- simplify_ontologies(dat_goterms)
+```{r get_go_and_gse}
+# Load the data from disk in dev mode to speed up the debugging process
+if (params$dev) {
+  load('/beegfs/scratch/bruening_scratch/pklemm/mygo/test/terms.Rdata')
+} else {
+  # Expect a data set containing q_values and Entrez/Ensembl IDs
+  dat_goterms <- dat %>% get_go_all_ontologies(significance_cutoff = params$significance_cutoff)
+  dat_goterms_simplified <- simplify_ontologies(dat_goterms)
+  dat_gse_go <- dat %>% get_gse_all_ontologies()
+  dat_gse_kegg <- dat %>% get_kegg()
+}
+```
+
+```{r plot_go, dev='svg'}
 dat_goterms %>% plot_all_ontologies(fc_symbol)
 ```
 
-## Simplified
+### Simplified
 
 ClusterProfiler allows usage of the `simplify` method that removes redundant GO terms. For details, refer to [this blog post](https://guangchuangyu.github.io/2015/10/use-simplify-to-remove-redundancy-of-enriched-go-terms/).
 
-```{r print_go_ontologies, dev='svg', layout="l-page"}
+```{r print_go_ontologies, dev='svg'}
 dat_goterms_simplified %>% plot_all_ontologies(fc_symbol)
 ```
 
-# Gene Set Enrichment (GSE) GO Analysis
+# Gene Set Enrichment (GSE) Analysis
+
+## Column {.tabset}
+
+### GSE GO Analysis
 
 * The GO-overrepresentation test can miss subtle changes in terms, for example when all genes in a term are up-regulated, but not enough the render each gene differentially regulated
 * The GSEA uses all genes to detect changes where all genes in a predefined set change in a small but coordinated way
 * Implemented in clusterProfiler and [described here](https://bioconductor.org/packages/release/bioc/vignettes/clusterProfiler/inst/doc/clusterProfiler.html#go-gene-set-enrichment-analysis)
 * The original paper is [Gene set enrichment analysis: A knowledge-based approach for interpreting genome-wide expression profiles](http://www.pnas.org/content/102/43/15545.long)
 
-```{r gse_all, dev='svg', layout="l-page"}
-dat_gse_go <- dat %>% get_gse_all_ontologies()
+```{r gse_all, dev='svg'}
 dat_gse_go %>% plot_all_ontologies(fc_symbol)
 ```
 
-# Gene Set Enrichtment KEGG Pathways
+### GSE KEGG Pathways
 
 Here we apply the GSE analysis to KEGG pathways.
 
-```{r gse_kegg_all, dev='svg', layout="l-page"}
-dat_gse_kegg <- dat %>% get_kegg()
+```{r gse_kegg_all, dev='svg'}
 dat_gse_kegg %>% plot_all_ontologies(fc_symbol)
 ```
 

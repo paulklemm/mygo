@@ -54,7 +54,7 @@ attach_gene_symbol_from_entrez <- function(dat) {
 #' @param significance_cutoff Specify the cutoff which entries are considered significant
 #' @param output_path Path to HTML output
 #' @return cummeRbund cuff object
-createHTMLReport <- function(dat, output_path, save_excel = TRUE, significance_cutoff = 0.05) {
+createHTMLReport <- function(dat, output_path, save_excel = TRUE, significance_cutoff = 0.05, dev = FALSE) {
   # https://stackoverflow.com/questions/30377213/how-to-include-rmarkdown-file-in-r-package
   path_to_report <- system.file("rmd/Report.Rmd", package="mygo")
   # Render the document and put it into the output dir
@@ -62,10 +62,11 @@ createHTMLReport <- function(dat, output_path, save_excel = TRUE, significance_c
     dat = dat,
     output_path = output_path,
     save_excel = save_excel,
-    significance_cutoff = significance_cutoff
+    significance_cutoff = significance_cutoff,
+    dev = dev
     ),
     output_dir = output_path,
-    output_options=list(
+    output_options = list(
       self_contained = TRUE
     )
   )
@@ -80,7 +81,7 @@ emap_plot <- function(go_terms, title) {
   # There is a bug with very small GO term selections that we have to catch
   # HACK
   if (go_terms %>% nrow() > 2) {
-    plot <- go_terms %>% enrichplot::emapplot() + ggplot2::ggtitle(title)  
+    plot <- go_terms %>% enrichplot::emapplot() + ggplot2::ggtitle(title)
     return(plot)
   }
 }
@@ -96,10 +97,13 @@ plot_terms_go <- function(go_terms, fc_symbol) {
     print("No go terms to plot")
     return()
   }
-  go_terms %>% enrichplot::heatplot(foldChange = fc_symbol) %>% plotly::ggplotly() %>% print()
-  #go_terms %>% clusterProfiler::cnetplot(foldChange = fc_symbol, circular = TRUE, colorEdge = TRUE) %>% print()
+  #go_terms %>% enrichplot::heatplot(foldChange = fc_symbol) %>% plotly::ggplotly()
+  go_terms %>% enrichplot::heatplot(foldChange = fc_symbol) %>% print()
+  # go_terms %>% clusterProfiler::cnetplot(foldChange = fc_symbol, circular = TRUE, colorEdge = TRUE) %>% print()
+  # plot <- go_terms %>% barplot(showCategory=10) + ggplot2::ggtitle('Barplot of Top10 GO Terms')
+  # plotly::ggplotly(plot)
   plot <- go_terms %>% barplot(showCategory=10) + ggplot2::ggtitle('Barplot of Top10 GO Terms')
-  plotly::ggplotly(plot)
+  plot %>% print()
   go_terms %>% enrichplot::goplot() %>% print()
   go_terms %>% emap_plot('Enrich Map Plot Plot') %>% print()
 }
@@ -120,8 +124,9 @@ plot_terms_gse <- function(gse_terms, fc_symbol) {
     print()
   gse_terms %>%
     enrichplot::heatplot(foldChange = fc_symbol) %>%
-    plotly::ggplotly() %>%
     print()
+    #enrichplot::heatplot(foldChange = fc_symbol) %>%
+    #plotly::ggplotly()
   gse_terms %>%
     enrichplot::gseaplot(geneSetID = 1) %>%
     print()
@@ -173,12 +178,8 @@ volcano_plot <- function(dat, label_top_n = 20) {
   plot <- dat %>%
     ggplot2::ggplot(aes(fc, -log10(q_value))) +
     ggplot2::geom_point(aes(color = Significant)) +
-    ggplot2::scale_color_manual(values = c("grey", "red")) +
-    ggrepel::geom_text_repel(
-        data = dat %>% filter(Significant == TRUE) %>% arrange(q_value) %>% head(label_top_n),
-        aes(label = Symbol)
-      )
-  return(plot)
+    ggplot2::scale_color_manual(values = c("grey", "red"))
+  return(plotly::ggplotly(plot))
 }
 
 #' Get GO-terms for all ontologies
@@ -193,9 +194,9 @@ get_go_all_ontologies <- function(dat, significance_cutoff = 0.05) {
     dplyr::filter(!is.na(EntrezID)) %>%
     dplyr::mutate(EntrezID = as.numeric(EntrezID)) %>% .$EntrezID
   go_terms <- list()
-  go_terms$BP <- significant_entrezgenes %>% perform_enrichGO(ontology = 'BP')
-  go_terms$MF <- significant_entrezgenes %>% perform_enrichGO(ontology = 'MF')
-  go_terms$CC <- significant_entrezgenes %>% perform_enrichGO(ontology = 'CC')
+  go_terms$Biological_Process <- significant_entrezgenes %>% perform_enrichGO(ontology = 'BP')
+  go_terms$Molecular_Function <- significant_entrezgenes %>% perform_enrichGO(ontology = 'MF')
+  go_terms$Cellular_Components <- significant_entrezgenes %>% perform_enrichGO(ontology = 'CC')
   go_terms %>% return()
 }
 
@@ -230,15 +231,15 @@ plot_all_ontologies <- function(ontologies, fc_symbol) {
 #' @param kegg_ontologies KEGG enrichResult
 #' @param path Path to exported excel file
 export_go_terms_to_excel <- function(go_ontologies, go_ontologies_simple, gse_ontologies, kegg_ontologies, path) {
-  BP_go <- go_ontologies$BP %>% as.tibble()
-  MF_go <- go_ontologies$MF %>% as.tibble()
-  CC_go <- go_ontologies$CC %>% as.tibble()
-  BP_go_simple <- go_ontologies_simple$BP %>% as.tibble()
-  MF_go_simple <- go_ontologies_simple$MF %>% as.tibble()
-  CC_go_simple <- go_ontologies_simple$CC %>% as.tibble()
-  BP_gse <- gse_ontologies$BP %>% as.tibble()
-  MF_gse <- gse_ontologies$MF %>% as.tibble()
-  CC_gse <- gse_ontologies$CC %>% as.tibble()
+  BP_go <- go_ontologies$Biological_Process %>% as.tibble()
+  MF_go <- go_ontologies$Molecular_Function %>% as.tibble()
+  CC_go <- go_ontologies$Cellular_Components %>% as.tibble()
+  BP_go_simple <- go_ontologies_simple$Biological_Process %>% as.tibble()
+  MF_go_simple <- go_ontologies_simple$Molecular_Function %>% as.tibble()
+  CC_go_simple <- go_ontologies_simple$Cellular_Components %>% as.tibble()
+  BP_gse <- gse_ontologies$Biological_Process %>% as.tibble()
+  MF_gse <- gse_ontologies$Molecular_Function %>% as.tibble()
+  CC_gse <- gse_ontologies$Cellular_Components %>% as.tibble()
   kegg_gse <- kegg_ontologies$kegg %>% as.tibble()
 
   c('BP_go', 'MF_go', 'CC_go', 'BP_go_simple', 'MF_go_simple', 'CC_go_simple', 'BP_gse', 'MF_gse', 'CC_gse', 'kegg_gse') %>%
@@ -274,10 +275,10 @@ get_gse_all_ontologies <- function(dat) {
   fc <- dat %>% get_named_fc_vector()
   gse_terms <- list()
   # Barplot of the fold change
-  fc %>% barplot()
-  gse_terms$BP <- perform_gseGO(ontology = 'BP', fc = fc)
-  gse_terms$MF <- perform_gseGO(ontology = 'MF', fc = fc)
-  gse_terms$CC <- perform_gseGO(ontology = 'CC', fc = fc)
+  # fc %>% barplot()
+  gse_terms$Biological_Process <- perform_gseGO(ontology = 'BP', fc = fc)
+  gse_terms$Molecular_Function <- perform_gseGO(ontology = 'MF', fc = fc)
+  gse_terms$Cellular_Components <- perform_gseGO(ontology = 'CC', fc = fc)
   gse_terms %>% return()
 }
 
