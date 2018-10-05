@@ -27,7 +27,7 @@ dat <- readr::read_tsv('test/geneexp_F_CPu.tsv') %>%
   dplyr::select(ensembl_gene_id, q_value, fc)
 # Standard Mode
 dat %>% mygo::createHTMLReport(
-  output_path = file.path(getwd(), 'result'),
+  output_path = file.path(getwd(), 'result')
 )
 # Debug Mode
 dat %>% mygo::createHTMLReport(
