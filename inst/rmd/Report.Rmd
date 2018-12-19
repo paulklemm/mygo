@@ -13,6 +13,7 @@ params:
   output_path: '.'
   save_excel: 'TRUE'
   significance_cutoff: 0.05
+  simplify_ontologies: TRUE
 ---
 
 # Overview
@@ -125,11 +126,14 @@ Also called GO-over represenation test.
 ```{r get_go_and_gse}
 # Load the data from disk in dev mode to speed up the debugging process
 if (params$dev) {
-  load('/beegfs/scratch/bruening_scratch/pklemm/mygo/test/terms.Rdata')
+  load('/beegfs/scratch/bruening_scratch/pklemm/rpackages/mygo/test/terms.Rdata')
 } else {
   # Expect a data set containing q_values and Entrez/Ensembl IDs
   dat_goterms <- dat %>% get_go_all_ontologies(significance_cutoff = params$significance_cutoff)
-  dat_goterms_simplified <- simplify_ontologies(dat_goterms)
+  # Get simplified ontologies if required
+  if (params$simplify_ontologies) {
+    dat_goterms_simplified <- simplify_ontologies(dat_goterms)
+  }
   dat_gse_go <- dat %>% get_gse_all_ontologies()
   dat_gse_kegg <- dat %>% get_kegg()
 }
@@ -144,7 +148,11 @@ dat_goterms %>% plot_all_ontologies(fc_symbol)
 ClusterProfiler allows usage of the `simplify` method that removes redundant GO terms. For details, refer to [this blog post](https://guangchuangyu.github.io/2015/10/use-simplify-to-remove-redundancy-of-enriched-go-terms/).
 
 ```{r print_go_ontologies, dev='svg'}
-dat_goterms_simplified %>% plot_all_ontologies(fc_symbol)
+if (params$simplify_ontologies) {
+  dat_goterms_simplified %>% plot_all_ontologies(fc_symbol)
+} else {
+  print("Simplified ontologies deactivated.")
+}
 ```
 
 # Gene Set Enrichment (GSE) Analysis
