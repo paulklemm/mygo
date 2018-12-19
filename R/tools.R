@@ -179,7 +179,7 @@ perform_enrichGO <- function(ontology, entrezgenes) {
 volcano_plot <- function(dat, label_top_n = 20) {
   dat %<>% mutate(Significant = q_value <= 0.05)
   plot <- dat %>%
-    ggplot2::ggplot(aes(fc, -log10(q_value), class = Symbol)) +
+    ggplot2::ggplot(aes(fc, -log10(q_value), key = Symbol)) +
     ggplot2::geom_point(aes(color = Significant)) +
     ggplot2::scale_color_manual(values = c("grey", "red"))
   return(plotly::ggplotly(plot))
