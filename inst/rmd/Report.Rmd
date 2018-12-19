@@ -179,6 +179,10 @@ dat_gse_kegg %>% plot_all_ontologies(fc_symbol)
 ```
 
 ```{r export_result}
+# Create dummy variable for for simplified gene ontologies if we did not calculate it
+if (!params$simplify_ontologies) {
+  dat_goterms_simplified <- data.frame()
+}
 # Export result
 if (params$save_excel) {
   export_go_terms_to_excel(
