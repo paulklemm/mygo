@@ -5,6 +5,7 @@
 <!-- TOC depthFrom:2 -->
 
 - [Examples](#examples)
+  - [Options for Rendering](#options-for-rendering)
 - [Installation](#installation)
 - [Restrictions & Data Preparations](#restrictions--data-preparations)
 - [Credits](#credits)
@@ -35,6 +36,15 @@ dat %>% mygo::createHTMLReport(
   dev = TRUE
 )
 ```
+
+### Options for Rendering
+
+- `dat` Input data frame
+- `output_path` Output path of the analysis document and the excel file
+- `save_excel`. Save GO-term result as Excel file
+- `significance_cutoff`. Filter for significant GO terms
+- `dev`. Developer mode. Do not use this.
+- `simplify_ontologies`. Run computational heavy GO term simplification.
 
 ## Installation
 
