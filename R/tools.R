@@ -83,7 +83,7 @@ createHTMLReport <- function(dat, output_path, save_excel = TRUE, significance_c
 emap_plot <- function(go_terms, title) {
   # There is a bug with very small GO term selections that we have to catch
   # HACK
-  if (go_terms %>% nrow() > 2) {
+  if (go_terms %>% nrow() > 5) {
     plot <- go_terms %>% enrichplot::emapplot() + ggplot2::ggtitle(title)
     return(plot)
   }
