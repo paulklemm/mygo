@@ -103,7 +103,7 @@ fc_symbol <- dat %>% .$fc %>% as.double() %>% `names<-`(dat$Symbol)
 
 To get a general feeling for the data we plot the differential expression analysis result as Volcano Plot.
 
-```{r volcano_plot, dev='svg'}
+```{r volcano_plot}
 dat %>% volcano_plot()
 ```
 
@@ -139,7 +139,7 @@ if (params$dev) {
 }
 ```
 
-```{r plot_go, dev='svg'}
+```{r plot_go}
 dat_goterms %>% plot_all_ontologies(fc_symbol)
 ```
 
@@ -147,7 +147,7 @@ dat_goterms %>% plot_all_ontologies(fc_symbol)
 
 ClusterProfiler allows usage of the `simplify` method that removes redundant GO terms. For details, refer to [this blog post](https://guangchuangyu.github.io/2015/10/use-simplify-to-remove-redundancy-of-enriched-go-terms/).
 
-```{r print_go_ontologies, dev='svg'}
+```{r print_go_ontologies}
 if (params$simplify_ontologies) {
   dat_goterms_simplified %>% plot_all_ontologies(fc_symbol)
 } else {
@@ -166,7 +166,7 @@ if (params$simplify_ontologies) {
 * Implemented in clusterProfiler and [described here](https://bioconductor.org/packages/release/bioc/vignettes/clusterProfiler/inst/doc/clusterProfiler.html#go-gene-set-enrichment-analysis)
 * The original paper is [Gene set enrichment analysis: A knowledge-based approach for interpreting genome-wide expression profiles](http://www.pnas.org/content/102/43/15545.long)
 
-```{r gse_all, dev='svg'}
+```{r gse_all}
 dat_gse_go %>% plot_all_ontologies(fc_symbol)
 ```
 
@@ -174,7 +174,7 @@ dat_gse_go %>% plot_all_ontologies(fc_symbol)
 
 Here we apply the GSE analysis to KEGG pathways.
 
-```{r gse_kegg_all, dev='svg'}
+```{r gse_kegg_all}
 dat_gse_kegg %>% plot_all_ontologies(fc_symbol)
 ```
 
