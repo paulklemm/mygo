@@ -9,7 +9,7 @@
 ensembl_to_entrez <- function(dat, ensembl_id_name, keep_only_rows_with_entrez = TRUE, drop_duplicates = TRUE) {
   # Get the Entrez IDs
   ens_to_ent <- dat[ensembl_id_name][[1]] %>%
-    clusterProfiler::bitr(fromType="ENSEMBL", toType="ENTREZID", OrgDb="org.Mm.eg.db") %>%
+    clusterProfiler::bitr(fromType = "ENSEMBL", toType = "ENTREZID", OrgDb = "org.Mm.eg.db") %>%
     dplyr::rename(EntrezID = ENTREZID)
   # Drop duplicates if required
   if (drop_duplicates) {
@@ -22,8 +22,8 @@ ensembl_to_entrez <- function(dat, ensembl_id_name, keep_only_rows_with_entrez =
       return()
   } else {
     dat %>%
-      dplyr::full_join(ens_to_ent, by = setNames("ENSEMBL", ensembl_id_name)) %>% 
-      tibble::as.tibble() %>% 
+      dplyr::full_join(ens_to_ent, by = setNames("ENSEMBL", ensembl_id_name)) %>%
+      tibble::as.tibble() %>%
       return()
   }
 }
@@ -58,7 +58,7 @@ attach_gene_symbol_from_entrez <- function(dat) {
 #' @return cummeRbund cuff object
 createHTMLReport <- function(dat, output_path, save_excel = TRUE, significance_cutoff = 0.05, dev = FALSE, simplify_ontologies = TRUE) {
   # https://stackoverflow.com/questions/30377213/how-to-include-rmarkdown-file-in-r-package
-  path_to_report <- system.file("rmd/Report.Rmd", package="mygo")
+  path_to_report <- system.file("rmd/Report.Rmd", package = "mygo")
   # Render the document and put it into the output dir
   render(path_to_report, params = list(
     dat = dat,
@@ -105,9 +105,13 @@ plot_terms_go <- function(go_terms, fc_symbol) {
   # go_terms %>% clusterProfiler::cnetplot(foldChange = fc_symbol, circular = TRUE, colorEdge = TRUE) %>% print()
   # plot <- go_terms %>% barplot(showCategory=10) + ggplot2::ggtitle('Barplot of Top10 GO Terms')
   # plotly::ggplotly(plot)
-  plot <- go_terms %>% barplot(showCategory=10) + ggplot2::ggtitle('Barplot of Top10 GO Terms')
+  plot <- go_terms %>% barplot(showCategory = 10) + ggplot2::ggtitle('Barplot of Top10 GO Terms')
   plot %>% print()
-  go_terms %>% enrichplot::goplot() %>% print()
+  # We had a problem getting the GOplot for small numbers of GO-terms
+  tryCatch(
+    go_terms %>% enrichplot::goplot() %>% print(),
+    error = function(error_message) { return("GOPlot not available") }
+  )
   go_terms %>% emap_plot('Enrich Map Plot Plot') %>% print()
 }
 
@@ -128,8 +132,8 @@ plot_terms_gse <- function(gse_terms, fc_symbol) {
   gse_terms %>%
     enrichplot::heatplot(foldChange = fc_symbol) %>%
     print()
-    #enrichplot::heatplot(foldChange = fc_symbol) %>%
-    #plotly::ggplotly()
+  #enrichplot::heatplot(foldChange = fc_symbol) %>%
+  #plotly::ggplotly()
   gse_terms %>%
     enrichplot::gseaplot(geneSetID = 1) %>%
     print()
@@ -163,11 +167,11 @@ simplify_ontologies <- function(ontologies) {
 #' @param enztezgenes List of entrezgenes to use for GO analysis
 perform_enrichGO <- function(ontology, entrezgenes) {
   clusterProfiler::enrichGO(
-      gene          = entrezgenes,
-      OrgDb         = org.Mm.eg.db::org.Mm.eg.db,
-      ont           = ontology,
-      readable      = TRUE
-    ) %>% 
+      gene = entrezgenes,
+      OrgDb = org.Mm.eg.db::org.Mm.eg.db,
+      ont = ontology,
+      readable = TRUE
+    ) %>%
     return()
 }
 
@@ -179,7 +183,7 @@ perform_enrichGO <- function(ontology, entrezgenes) {
 volcano_plot <- function(dat, label_top_n = 20) {
   dat %<>% mutate(Significant = q_value <= 0.05)
   plot <- dat %>%
-    ggplot2::ggplot(aes(fc, -log10(q_value), key = Symbol)) +
+    ggplot2::ggplot(aes(fc, - log10(q_value), key = Symbol)) +
     ggplot2::geom_point(aes(color = Significant)) +
     ggplot2::scale_color_manual(values = c("grey", "red"))
   return(plotly::ggplotly(plot))
@@ -211,7 +215,7 @@ get_go_all_ontologies <- function(dat, significance_cutoff = 0.05) {
 #' @param fc_symbol double vector containing the fold changes named by symbol
 plot_all_ontologies <- function(ontologies, fc_symbol) {
   ontologies %>%
-  purrr::iwalk(function(.x, .y){
+  purrr::iwalk(function(.x, .y) {
     # Print GO ontology
     .y %>% print()
     # Print GO ontology plots
@@ -306,13 +310,13 @@ get_kegg <- function(dat) {
 #' @param fc Named vector of foldchanges (name denotes Entrez ID)
 perform_gseGO <- function(ontology, fc) {
   clusterProfiler::gseGO(geneList = fc,
-    OrgDb        = org.Mm.eg.db,
-    ont          = ontology,
-    nPerm        = 1000,
-    minGSSize    = 100,
-    maxGSSize    = 500,
+    OrgDb = org.Mm.eg.db,
+    ont = ontology,
+    nPerm = 1000,
+    minGSSize = 100,
+    maxGSSize = 500,
     pvalueCutoff = 0.05,
-    verbose      = FALSE
+    verbose = FALSE
   ) %>%
     DOSE::setReadable(OrgDb = org.Mm.eg.db) %>%
     return()
@@ -324,6 +328,6 @@ perform_gseGO <- function(ontology, fc) {
 #' @import magrittr clusterProfiler DOSE
 #' @param fc Named vector of foldchanges (name denotes Entrez ID)
 perform_gseKEGG <- function(fc) {
-  fc %>% clusterProfiler::gseKEGG(nPerm=10000, organism = 'mmu') %>%
+  fc %>% clusterProfiler::gseKEGG(nPerm = 10000, organism = 'mmu') %>%
     return()
 }
