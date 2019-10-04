@@ -5,6 +5,8 @@
 <!-- TOC depthFrom:2 -->
 
 - [Examples](#examples)
+  - [Whole dataset](#whole-dataset)
+  - [Selected genes](#selected-genes)
   - [Options for Rendering](#options-for-rendering)
 - [Installation](#installation)
 - [Restrictions & Data Preparations](#restrictions--data-preparations)
@@ -17,6 +19,8 @@
 Conduct GO-term analysis using [clusterProfiler](https://guangchuangyu.github.io/software/clusterProfiler/) and print report.
 
 ## Examples
+
+### Whole dataset
 
 ```R
 library(magrittr)
@@ -37,6 +41,42 @@ dat %>% mygo::createHTMLReport(
 )
 ```
 
+### Selected genes
+
+Sometimes you want to do a GO term analysis only for a small number of genes. In this case, we need to make sure to get the proper gene names and deactivate the GSEA analysis.
+
+Here is an example call.
+
+```R
+my_genes <- readxl::read_xlsx("data/dat.xlsx") %>%
+  dplyr::mutate(
+    gene_name = `Gene names`,
+    fc = `-Log t-test p value`) %>%
+  dplyr::select(
+    gene_name,
+    fc
+  ) %>%
+  tidyr::separate_rows(gene_name, sep = ";") %>%
+  dplyr::distinct(gene_name, .keep_all = TRUE) %>%
+  dplyr::mutate(
+    gene_name_fixed = rmyknife::get_gene_name_from_synonym(gene_name)
+  ) %>%
+  rmyknife::attach_ensembl_gene_id_from_name(
+    gene_name_var = "gene_name_fixed",
+    ensembl_version = 96
+  ) %>%
+  # We do not need the q-values, so set them to 0
+  dplyr::mutate(q_value = 0)
+
+my_genes %>%
+  mygo::createHTMLReport(
+    output_path = file.path(getwd(), 'result', 'c5'),
+    save_excel = TRUE,
+    do_gse = FALSE
+)
+```
+
+
 ### Options for Rendering
 
 - `dat` Input data frame
@@ -45,6 +85,7 @@ dat %>% mygo::createHTMLReport(
 - `significance_cutoff`. Filter for significant GO terms
 - `dev`. Developer mode. Do not use this.
 - `simplify_ontologies`. Run computational heavy GO term simplification.
+- `do_gse`. Conduct a GSEA analysis. Deactivate if you do not pipe in a whole gene set.
 
 ## Installation
 

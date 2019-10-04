@@ -14,6 +14,7 @@ params:
   save_excel: 'TRUE'
   significance_cutoff: 0.05
   simplify_ontologies: TRUE
+  do_gse: TRUE
 ---
 
 # Overview
@@ -134,8 +135,17 @@ if (params$dev) {
   if (params$simplify_ontologies) {
     dat_goterms_simplified <- simplify_ontologies(dat_goterms)
   }
-  dat_gse_go <- dat %>% get_gse_all_ontologies()
-  dat_gse_kegg <- dat %>% get_kegg()
+  if (params$do_gse) {
+    dat_gse_go <- dat %>% get_gse_all_ontologies()
+    dat_gse_kegg <- dat %>% get_kegg()
+  } else {
+    dat_gse_go <- list()
+    dat_gse_go$Biological_Process <- tibble::tibble()
+    dat_gse_go$Molecular_Function <- tibble::tibble()
+    dat_gse_go$Cellular_Components <- tibble::tibble()
+    dat_gse_kegg <- list()
+    dat_gse_kegg$kegg <- tibble::tibble()
+  }
 }
 ```
 
@@ -167,7 +177,11 @@ if (params$simplify_ontologies) {
 * The original paper is [Gene set enrichment analysis: A knowledge-based approach for interpreting genome-wide expression profiles](http://www.pnas.org/content/102/43/15545.long)
 
 ```{r gse_all}
-dat_gse_go %>% plot_all_ontologies(fc_symbol)
+if (params$do_gse) {
+  dat_gse_go %>% plot_all_ontologies(fc_symbol)
+} else {
+  print("GSE analysis disabled")
+}
 ```
 
 ### GSE KEGG Pathways
@@ -175,7 +189,11 @@ dat_gse_go %>% plot_all_ontologies(fc_symbol)
 Here we apply the GSE analysis to KEGG pathways.
 
 ```{r gse_kegg_all}
-dat_gse_kegg %>% plot_all_ontologies(fc_symbol)
+if (params$do_gse) {
+  dat_gse_kegg %>% plot_all_ontologies(fc_symbol)
+} else {
+  print("GSE analysis disabled")
+}
 ```
 
 ```{r export_result}
