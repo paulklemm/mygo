@@ -4,12 +4,12 @@
 
 <!-- TOC depthFrom:2 -->
 
+- [Restrictions & Data Preparations](#restrictions--data-preparations)
 - [Examples](#examples)
   - [Whole dataset](#whole-dataset)
   - [Selected genes](#selected-genes)
   - [Options for Rendering](#options-for-rendering)
 - [Installation](#installation)
-- [Restrictions & Data Preparations](#restrictions--data-preparations)
 - [Credits](#credits)
 
 <!-- /TOC -->
@@ -18,10 +18,17 @@
 
 Conduct GO-term analysis using [clusterProfiler](https://guangchuangyu.github.io/software/clusterProfiler/) and print report.
 
-## Examples
+## Restrictions & Data Preparations
 
-MyGO expects a data frame containing `ensembl_gene_id`/`EntrezID`, `q_value` and `fc`.
-If `EntrezID` is not included, it will convert `ensembl_gene_id` to `EntrezID`
+Currently only `mus musculus` datasets are supported.
+
+The data frame input needs to have the following dimensions:
+
+- `ensembl_gene_id` or `EntrezID` (`character`)
+- `q_value` (`numeric`)
+- `Symbol` (`character`)
+
+Here is an example tibble.
 
 ```R
 # A tibble: 18,777 x 3
@@ -39,6 +46,9 @@ If `EntrezID` is not included, it will convert `ensembl_gene_id` to `EntrezID`
 10 ENSMUSG00000102135  0.672  -0.547  
 # … with 18,767 more rows
 ```
+
+
+## Examples
 
 ### Whole dataset
 
@@ -96,7 +106,6 @@ my_genes %>%
 
 ```
 
-
 ### Options for Rendering
 
 - `dat` Input data frame
@@ -112,16 +121,6 @@ my_genes %>%
 # install.packages('devtools')
 devtools::install_github("paulklemm/mygo")
 ```
-
-## Restrictions & Data Preparations
-
-Currently only `mus musculus` datasets are supported.
-
-The data frame input needs to have the following dimensions:
-
-- `ensembl_gene_id` or `EntrezID` (`character`)
-- `q_value` (`numeric`)
-- `Symbol` (`character`)
 
 ## Credits
 
