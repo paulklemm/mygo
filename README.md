@@ -9,6 +9,7 @@
   - [Whole dataset](#whole-dataset)
   - [Selected genes](#selected-genes)
   - [Options for Rendering](#options-for-rendering)
+- [Debug Run](#debug-run)
 - [Installation](#installation)
 - [Credits](#credits)
 
@@ -114,6 +115,36 @@ my_genes %>%
 - `simplify_ontologies`. Run computational heavy GO term simplification.
 - `do_gse`. Conduct a GSEA analysis. Deactivate if you do not pipe in a whole gene set.
 - `use_background`. Use background of significant/not significant genes instead of all genes.
+
+## Debug Run
+
+Internal use only.
+
+```r
+
+my_dat <- readr::read_tsv('test/geneexp_F_CPu.tsv') %>%
+  dplyr::rename(fc = `log2(fold_change)`) %>%
+  dplyr::mutate(Symbol = ensembl_gene_id) %>%
+  dplyr::filter(status == "OK") %>%
+  dplyr::select(ensembl_gene_id, q_value, fc)
+
+
+my_dat %>%
+  xaringan::infinite_moon_reader(
+    moon = "inst/rmd/Report.Rmd",
+    cast_from=file.path(getwd(), "inst", "rmd"),
+    params = list(
+      dat = dat,
+      output_path = ".",
+      save_excel = TRUE,
+      significance_cutoff = 0.05,
+      simplify_ontologies = FALSE,
+      do_gse = FALSE,
+      use_background = TRUE
+    )
+  )
+```
+
 
 ## Installation
 
