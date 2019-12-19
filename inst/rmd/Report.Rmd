@@ -3,10 +3,10 @@ title: GO-Term Analysis
 date: "`r Sys.Date()`"
 output:
   flexdashboard::flex_dashboard:
-    fig_width: 12
+    fig_width: 14
+    fig_height: 10
     toc_float: yes
     code_folding: hide
-    fig_height: 8
 params:
   dat: ''
   output_path: '.'

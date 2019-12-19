@@ -106,8 +106,6 @@ plot_terms_go <- function(go_terms, fc_symbol) {
     print("No go terms to plot")
     return()
   }
-  #go_terms %>% enrichplot::heatplot(foldChange = fc_symbol) %>% plotly::ggplotly()
-  go_terms %>% enrichplot::heatplot(foldChange = fc_symbol) %>% print()
   # go_terms %>% clusterProfiler::cnetplot(foldChange = fc_symbol, circular = TRUE, colorEdge = TRUE) %>% print()
   # plot <- go_terms %>% barplot(showCategory=10) + ggplot2::ggtitle('Barplot of Top10 GO Terms')
   # plotly::ggplotly(plot)

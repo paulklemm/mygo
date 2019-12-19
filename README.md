@@ -47,7 +47,6 @@ Here is an example tibble.
 # … with 18,767 more rows
 ```
 
-
 ## Examples
 
 ### Whole dataset
