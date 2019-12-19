@@ -40,7 +40,12 @@ library(magrittr)
 library(tibble)
 library(knitr)
 
-paste0("Settings: output_path: ", params$output_path, ", save_excel: ", params$save_excel, ", significance_cutoff: ", params$significance_cutoff)
+# Print settings as table
+tibble::tibble(
+  name = c("output_path", "save_excel", "significance_cutoff", "simplify_ontologies", "do_gse", "use_background"),
+  setting = c(params$output_path, params$save_excel, params$significance_cutoff, params$simplify_ontologies, params$do_gse, params$use_background)
+) %>%
+  knitr::kable()
 
 print(params$dat)
 
