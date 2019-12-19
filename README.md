@@ -99,7 +99,7 @@ my_genes %>%
   mygo::createHTMLReport(
     output_path = file.path(getwd(), 'result', 'c5'),
     save_excel = TRUE,
-    do_gse = FALSE
+    do_gse = FALSE,
     use_background = TRUE
 )
 
@@ -113,6 +113,7 @@ my_genes %>%
 - `significance_cutoff`. Filter for significant GO terms
 - `simplify_ontologies`. Run computational heavy GO term simplification.
 - `do_gse`. Conduct a GSEA analysis. Deactivate if you do not pipe in a whole gene set.
+- `use_background`. Use background of significant/not significant genes instead of all genes.
 
 ## Installation
 
