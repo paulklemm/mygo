@@ -9,7 +9,6 @@ output:
     fig_height: 8
 params:
   dat: ''
-  dev: 'FALSE'
   output_path: '.'
   save_excel: 'TRUE'
   significance_cutoff: 0.05
@@ -35,26 +34,13 @@ The data frame input needs to have the following dimensions:
 - `Symbol` (`character`)
 
 ```{r setup}
+
 library(mygo)
 library(magrittr)
 library(tibble)
 library(knitr)
 
-# Debug
-# DEBUG Statements
-if (!exists('params')) {
-  params <- list()
-  params$dat <- readr::read_tsv('test/geneexp_F_CPu.tsv') %>%
-    dplyr::rename(fc = `log2(fold_change)`) %>%
-    dplyr::mutate(Symbol = ensembl_gene_id) %>%
-    dplyr::filter(status == "OK") %>%
-    dplyr::select(ensembl_gene_id, q_value, fc)
-  params$output_path <- '.'
-  params$save_excel <- TRUE
-  params$significance_cutoff <- 0.05
-}
-
-paste0("Settings: dev: ", params$dev, ", output_path: ", params$output_path, ", save_excel: ", params$save_excel, ", significance_cutoff: ", params$significance_cutoff)
+paste0("Settings: output_path: ", params$output_path, ", save_excel: ", params$save_excel, ", significance_cutoff: ", params$significance_cutoff)
 
 print(params$dat)
 
@@ -130,30 +116,26 @@ Also called GO-over represenation test.
 ### All
 
 ```{r get_go_and_gse}
-# Load the data from disk in dev mode to speed up the debugging process
-if (params$dev) {
-  load('/beegfs/scratch/bruening_scratch/pklemm/rpackages/mygo/test/terms.Rdata')
+
+# Expect a data set containing q_values and Entrez/Ensembl IDs
+dat_goterms <- dat %>% get_go_all_ontologies(
+  significance_cutoff = params$significance_cutoff,
+  use_background = params$use_background
+)
+# Get simplified ontologies if required
+if (params$simplify_ontologies) {
+  dat_goterms_simplified <- simplify_ontologies(dat_goterms)
+}
+if (params$do_gse) {
+  dat_gse_go <- dat %>% get_gse_all_ontologies()
+  dat_gse_kegg <- dat %>% get_kegg()
 } else {
-  # Expect a data set containing q_values and Entrez/Ensembl IDs
-  dat_goterms <- dat %>% get_go_all_ontologies(
-    significance_cutoff = params$significance_cutoff,
-    use_background = params$use_background
-  )
-  # Get simplified ontologies if required
-  if (params$simplify_ontologies) {
-    dat_goterms_simplified <- simplify_ontologies(dat_goterms)
-  }
-  if (params$do_gse) {
-    dat_gse_go <- dat %>% get_gse_all_ontologies()
-    dat_gse_kegg <- dat %>% get_kegg()
-  } else {
-    dat_gse_go <- list()
-    dat_gse_go$Biological_Process <- tibble::tibble()
-    dat_gse_go$Molecular_Function <- tibble::tibble()
-    dat_gse_go$Cellular_Components <- tibble::tibble()
-    dat_gse_kegg <- list()
-    dat_gse_kegg$kegg <- tibble::tibble()
-  }
+  dat_gse_go <- list()
+  dat_gse_go$Biological_Process <- tibble::tibble()
+  dat_gse_go$Molecular_Function <- tibble::tibble()
+  dat_gse_go$Cellular_Components <- tibble::tibble()
+  dat_gse_kegg <- list()
+  dat_gse_kegg$kegg <- tibble::tibble()
 }
 ```
 

@@ -5,7 +5,7 @@
 \title{Make GO-Term analysis and print out Report}
 \usage{
 createHTMLReport(dat, output_path, save_excel = TRUE,
-  significance_cutoff = 0.05, dev = FALSE, do_gse = TRUE,
+  significance_cutoff = 0.05, do_gse = TRUE,
   simplify_ontologies = TRUE)
 }
 \arguments{
@@ -16,8 +16,6 @@ createHTMLReport(dat, output_path, save_excel = TRUE,
 \item{save_excel}{Save GO-terms to Excel files}
 
 \item{significance_cutoff}{Specify the cutoff which entries are considered significant}
-
-\item{dev}{Run in developer mode}
 
 \item{do_gse}{Conduct GSE analysis}
 

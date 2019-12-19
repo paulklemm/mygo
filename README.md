@@ -43,6 +43,7 @@ If `EntrezID` is not included, it will convert `ensembl_gene_id` to `EntrezID`
 ### Whole dataset
 
 ```R
+
 library(magrittr)
 # Create data frame that fits the need of the analysis
 dat <- readr::read_tsv('test/geneexp_F_CPu.tsv') %>%
@@ -50,15 +51,11 @@ dat <- readr::read_tsv('test/geneexp_F_CPu.tsv') %>%
   dplyr::mutate(Symbol = ensembl_gene_id) %>%
   dplyr::filter(status == "OK") %>%
   dplyr::select(ensembl_gene_id, q_value, fc)
-# Standard Mode
+
 dat %>% mygo::createHTMLReport(
   output_path = file.path(getwd(), 'result')
 )
-# Debug Mode
-dat %>% mygo::createHTMLReport(
-  output_path = file.path(getwd(), 'result'),
-  dev = TRUE
-)
+
 ```
 
 ### Selected genes
@@ -68,6 +65,7 @@ Sometimes you want to do a GO term analysis only for a small number of genes. In
 Here is an example call.
 
 ```R
+
 my_genes <- readxl::read_xlsx("data/dat.xlsx") %>%
   dplyr::mutate(
     gene_name = `Gene names`,
@@ -95,6 +93,7 @@ my_genes %>%
     do_gse = FALSE
     use_background = TRUE
 )
+
 ```
 
 
@@ -104,7 +103,6 @@ my_genes %>%
 - `output_path` Output path of the analysis document and the excel file
 - `save_excel`. Save GO-term result as Excel file
 - `significance_cutoff`. Filter for significant GO terms
-- `dev`. Developer mode. Do not use this.
 - `simplify_ontologies`. Run computational heavy GO term simplification.
 - `do_gse`. Conduct a GSEA analysis. Deactivate if you do not pipe in a whole gene set.
 

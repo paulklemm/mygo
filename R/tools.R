@@ -53,11 +53,10 @@ attach_gene_symbol_from_entrez <- function(dat) {
 #' @param save_excel Save GO-terms to Excel files
 #' @param significance_cutoff Specify the cutoff which entries are considered significant
 #' @param output_path Path to HTML output
-#' @param dev Run in developer mode
 #' @param simplify_ontologies Run time-consuming ontology simplification
 #' @param do_gse Conduct GSE analysis
 #' @return cummeRbund cuff object
-createHTMLReport <- function(dat, output_path, save_excel = TRUE, significance_cutoff = 0.05, dev = FALSE, do_gse = TRUE, simplify_ontologies = TRUE) {
+createHTMLReport <- function(dat, output_path, save_excel = TRUE, significance_cutoff = 0.05, do_gse = TRUE, simplify_ontologies = TRUE) {
   # https://stackoverflow.com/questions/30377213/how-to-include-rmarkdown-file-in-r-package
   path_to_report <- system.file("rmd/Report.Rmd", package = "mygo")
   # Render the document and put it into the output dir
@@ -68,7 +67,6 @@ createHTMLReport <- function(dat, output_path, save_excel = TRUE, significance_c
       output_path = output_path,
       save_excel = save_excel,
       significance_cutoff = significance_cutoff,
-      dev = dev,
       simplify_ontologies = simplify_ontologies,
       do_gse = do_gse
     ),
