@@ -171,16 +171,29 @@ simplify_ontologies <- function(ontologies) {
 #'
 #' @export
 #' @import magrittr clusterProfiler org.Mm.eg.db
-#' @param ontoloty Can be either "BP", "CC", "MF"
-#' @param enztezgenes List of entrezgenes to use for GO analysis
-perform_enrichGO <- function(ontology, entrezgenes) {
-  clusterProfiler::enrichGO(
+#' @param ontology Can be either "BP", "CC", "MF"
+#' @param entrezgenes List of entrezgenes to use for GO analysis
+#' @param entrez_background_genes List of background genes 
+#' @param use_background use specified background genes
+perform_enrichGO <- function(ontology, entrezgenes, background_genes, use_background) {
+  if (use_background) {
+    clusterProfiler::enrichGO(
+      gene = entrezgenes,
+      OrgDb = org.Mm.eg.db::org.Mm.eg.db,
+      universe = background_genes,
+      ont = ontology,
+      readable = TRUE
+    ) %>%
+    return()
+  } else {
+    clusterProfiler::enrichGO(
       gene = entrezgenes,
       OrgDb = org.Mm.eg.db::org.Mm.eg.db,
       ont = ontology,
       readable = TRUE
     ) %>%
     return()
+  }
 }
 
 #' Return a volcano plot with annotated top_n values
@@ -203,15 +216,38 @@ volcano_plot <- function(dat, label_top_n = 20) {
 #' @export
 #' @param dat Data frame containing columns `pValue` and `EntrezID`
 #' @param significance_cutoff Cutoff to consider genes as significant
-get_go_all_ontologies <- function(dat, significance_cutoff = 0.05) {
-  significant_entrezgenes <- dat %>%
-    dplyr::filter(q_value <= significance_cutoff) %>%
+#' @param use_background Use gene list as background instead of using all genes as background
+get_go_all_ontologies <- function(dat, significance_cutoff = 0.05, use_background = TRUE) {
+  # Prepare data frame
+  valid_dat <- dat %>%
     dplyr::filter(!is.na(EntrezID)) %>%
-    dplyr::mutate(EntrezID = as.numeric(EntrezID)) %>% .$EntrezID
+    #dplyr::mutate(EntrezID = as.numeric(EntrezID))
+    dplyr::mutate(EntrezID = as.character(EntrezID))
+
+  # Get all genes in the data set as background universe
+  background_entrezgenes <- valid_dat %>%
+    .$EntrezID
+  # Get significant genes
+  significant_entrezgenes <- valid_dat %>%
+    dplyr::filter(q_value <= significance_cutoff) %>%
+    .$EntrezID
+  # Perform GO-term analysis for each term
   go_terms <- list()
-  go_terms$Biological_Process <- significant_entrezgenes %>% perform_enrichGO(ontology = 'BP')
-  go_terms$Molecular_Function <- significant_entrezgenes %>% perform_enrichGO(ontology = 'MF')
-  go_terms$Cellular_Components <- significant_entrezgenes %>% perform_enrichGO(ontology = 'CC')
+  go_terms$Biological_Process <- significant_entrezgenes %>% perform_enrichGO(
+    ontology = "BP",
+    background_genes = background_entrezgenes,
+    use_background = use_background
+  )
+  go_terms$Molecular_Function <- significant_entrezgenes %>% perform_enrichGO(
+    ontology = "MF",
+    background_genes = background_entrezgenes,
+    use_background = use_background
+  )
+  go_terms$Cellular_Components <- significant_entrezgenes %>% perform_enrichGO(
+    ontology = "CC",
+    background_genes = background_entrezgenes,
+    use_background = use_background
+  )
   go_terms %>% return()
 }
 

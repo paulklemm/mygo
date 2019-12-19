@@ -20,6 +20,26 @@ Conduct GO-term analysis using [clusterProfiler](https://guangchuangyu.github.io
 
 ## Examples
 
+MyGO expects a data frame containing `ensembl_gene_id`/`EntrezID`, `q_value` and `fc`.
+If `EntrezID` is not included, it will convert `ensembl_gene_id` to `EntrezID`
+
+```R
+# A tibble: 18,777 x 3
+   ensembl_gene_id    q_value       fc
+   <chr>                <dbl>    <dbl>
+ 1 ENSMUSG00000103922  0.998   0.00361
+ 2 ENSMUSG00000025903  0.443   0.141  
+ 3 ENSMUSG00000104217  0.443   0.141  
+ 4 ENSMUSG00000033813  0.443   0.141  
+ 5 ENSMUSG00000033793  0.718   0.0864 
+ 6 ENSMUSG00000025905  0.0553  0.334  
+ 7 ENSMUSG00000025907  0.747   0.0919 
+ 8 ENSMUSG00000087247  0.282  -3.24   
+ 9 ENSMUSG00000033740  0.431  -0.221  
+10 ENSMUSG00000102135  0.672  -0.547  
+# … with 18,767 more rows
+```
+
 ### Whole dataset
 
 ```R
@@ -73,6 +93,7 @@ my_genes %>%
     output_path = file.path(getwd(), 'result', 'c5'),
     save_excel = TRUE,
     do_gse = FALSE
+    use_background = TRUE
 )
 ```
 

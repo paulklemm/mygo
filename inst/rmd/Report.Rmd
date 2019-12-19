@@ -15,6 +15,7 @@ params:
   significance_cutoff: 0.05
   simplify_ontologies: TRUE
   do_gse: TRUE
+  use_background: TRUE
 ---
 
 # Overview
@@ -43,7 +44,11 @@ library(knitr)
 # DEBUG Statements
 if (!exists('params')) {
   params <- list()
-  params$dat <- readr::read_tsv('test/geneexp_F_CPu.tsv') %>% dplyr::rename(fc = `log2(fold_change)`) %>% dplyr::mutate(Symbol = ensembl_gene_id) %>% dplyr::filter(status == "OK") %>% dplyr::select(ensembl_gene_id, q_value, fc)
+  params$dat <- readr::read_tsv('test/geneexp_F_CPu.tsv') %>%
+    dplyr::rename(fc = `log2(fold_change)`) %>%
+    dplyr::mutate(Symbol = ensembl_gene_id) %>%
+    dplyr::filter(status == "OK") %>%
+    dplyr::select(ensembl_gene_id, q_value, fc)
   params$output_path <- '.'
   params$save_excel <- TRUE
   params$significance_cutoff <- 0.05
@@ -130,7 +135,10 @@ if (params$dev) {
   load('/beegfs/scratch/bruening_scratch/pklemm/rpackages/mygo/test/terms.Rdata')
 } else {
   # Expect a data set containing q_values and Entrez/Ensembl IDs
-  dat_goterms <- dat %>% get_go_all_ontologies(significance_cutoff = params$significance_cutoff)
+  dat_goterms <- dat %>% get_go_all_ontologies(
+    significance_cutoff = params$significance_cutoff,
+    use_background = params$use_background
+  )
   # Get simplified ontologies if required
   if (params$simplify_ontologies) {
     dat_goterms_simplified <- simplify_ontologies(dat_goterms)

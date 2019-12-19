@@ -4,12 +4,15 @@
 \alias{get_go_all_ontologies}
 \title{Get GO-terms for all ontologies}
 \usage{
-get_go_all_ontologies(dat, significance_cutoff = 0.05)
+get_go_all_ontologies(dat, significance_cutoff = 0.05,
+  use_background = TRUE)
 }
 \arguments{
 \item{dat}{Data frame containing columns \code{pValue} and \code{EntrezID}}
 
 \item{significance_cutoff}{Cutoff to consider genes as significant}
+
+\item{use_background}{Use gene list as background instead of using all genes as background}
 }
 \description{
 Get GO-terms for all ontologies
