@@ -129,20 +129,20 @@ my_dat <- readr::read_tsv('test/geneexp_F_CPu.tsv') %>%
   dplyr::select(ensembl_gene_id, q_value, fc)
 
 
-my_dat %>%
-  xaringan::infinite_moon_reader(
-    moon = "inst/rmd/Report.Rmd",
-    cast_from=file.path(getwd(), "inst", "rmd"),
-    params = list(
-      dat = dat,
-      output_path = ".",
-      save_excel = TRUE,
-      significance_cutoff = 0.05,
-      simplify_ontologies = FALSE,
-      do_gse = FALSE,
-      use_background = TRUE
-    )
+xaringan::infinite_moon_reader(
+  moon = "inst/rmd/Report.Rmd",
+  cast_from=file.path(getwd(), "inst", "rmd"),
+  params = list(
+    dat = my_dat,
+    output_path = ".",
+    save_excel = TRUE,
+    significance_cutoff = 0.05,
+    simplify_ontologies = FALSE,
+    do_gse = FALSE,
+    use_background = TRUE
   )
+)
+
 ```
 
 
