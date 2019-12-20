@@ -128,7 +128,6 @@ my_dat <- readr::read_tsv('test/geneexp_F_CPu.tsv') %>%
   dplyr::filter(status == "OK") %>%
   dplyr::select(ensembl_gene_id, q_value, fc)
 
-
 xaringan::infinite_moon_reader(
   moon = "inst/rmd/Report.Rmd",
   cast_from=file.path(getwd(), "inst", "rmd"),
