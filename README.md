@@ -27,7 +27,7 @@ The data frame input needs to have the following dimensions:
 
 - `ensembl_gene_id` or `EntrezID` (`character`)
 - `q_value` (`numeric`)
-- `Symbol` (`character`)
+- `Symbol` (`character`) (optional, but it's easier to identify genes that cannot be associated with an EntrezID)
 
 Here is an example tibble.
 
@@ -62,6 +62,7 @@ dat <- readr::read_tsv('test/geneexp_F_CPu.tsv') %>%
   dplyr::filter(status == "OK") %>%
   dplyr::select(ensembl_gene_id, q_value, fc)
 
+# Here we do not pass a Symbol column. This won't result in an error.
 dat %>% mygo::createHTMLReport(
   output_path = file.path(getwd(), 'result')
 )
