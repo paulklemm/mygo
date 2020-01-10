@@ -27,6 +27,7 @@ The data frame input needs to have the following dimensions:
 
 - `ensembl_gene_id` or `EntrezID` (`character`)
 - `q_value` (`numeric`)
+- `fc` (`numeric`)
 - `Symbol` (`character`) (optional, but it's easier to identify genes that cannot be associated with an EntrezID)
 
 Here is an example tibble.
