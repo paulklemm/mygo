@@ -1,1 +1,5 @@
 ^LICENSE\.md$
+^inst/rmd/Report\.html$
+^inst/rmd/go_terms\.xlsx$
+^result$
+^result_old$

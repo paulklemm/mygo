@@ -10,7 +10,7 @@ output:
 params:
   dat: ''
   output_path: '.'
-  save_excel: 'TRUE'
+  save_excel: TRUE
   significance_cutoff: 0.05
   simplify_ontologies: TRUE
   do_gse: TRUE
@@ -35,6 +35,18 @@ The data frame input needs to have the following dimensions:
 
 ```{r setup, echo = FALSE, message = TRUE, warning = TRUE, results = 'asis'}
 
+# Retreive parameter settings
+
+rmd_params <- list()
+
+rmd_params$dat <- params$dat
+rmd_params$output_path <- params$output_path
+rmd_params$save_excel <- params$save_excel
+rmd_params$significance_cutoff <- params$significance_cutoff
+rmd_params$simplify_ontologies <- params$simplify_ontologies
+rmd_params$do_gse <- params$do_gse
+rmd_params$use_background <- params$use_background
+
 library(mygo)
 library(magrittr)
 library(tibble)
@@ -43,41 +55,43 @@ library(knitr)
 # Print settings as table
 tibble::tibble(
   name = c("output_path", "save_excel", "significance_cutoff", "simplify_ontologies", "do_gse", "use_background"),
-  setting = c(params$output_path, params$save_excel, params$significance_cutoff, params$simplify_ontologies, params$do_gse, params$use_background)
+  setting = c(rmd_params$output_path, rmd_params$save_excel, rmd_params$significance_cutoff, rmd_params$simplify_ontologies, rmd_params$do_gse, rmd_params$use_background)
 ) %>%
   knitr::kable()
 
 # Summary for parameter file
 print("Data table head:")
-params$dat %>%
+rmd_params$dat %>%
   head() %>%
   knitr::kable()
-paste0("dat contains ", params$dat %>% nrow(), " rows.")
+paste0("dat contains ", rmd_params$dat %>% nrow(), " rows.")
 
-if (!('q_value' %in% colnames(params$dat))) {
+if (!('q_value' %in% colnames(rmd_params$dat))) {
   stop('Column `q_value` not found in data frame')
-} else if (!('fc' %in% colnames(params$dat))) {
+} else if (!('fc' %in% colnames(rmd_params$dat))) {
   stop('Column `fc` not found in data frame')
 }
 
 # Filter significant genes
-if (!('EntrezID' %in% colnames(params$dat))) {
+if (!('EntrezID' %in% colnames(rmd_params$dat))) {
   warning('EntrezID not available in data frame. Attaching it manually')
-  dat <- params$dat %>%
+  dat <- rmd_params$dat %>%
     ensembl_to_entrez(ensembl_id_name = "ensembl_gene_id", keep_only_rows_with_entrez = TRUE, drop_duplicates = TRUE) %>%
     attach_gene_symbol_from_entrez()
   
   # Get regulated genes that don't have a EntrezID
   # https://github.sf.mpg.de/bruening-lab/2018-01-Weiyi-Differential-Gene-Expression-Analysis/blob/master/Analysis_DESeq.Rmd
   print("Regulated genes that do not map to a EntrezID")
-  params$dat %>%
-    dplyr::filter(q_value <= params$significance_cutoff) %>%
-    dplyr::anti_join(dat %>% dplyr::filter(q_value <= params$significance_cutoff), by = "ensembl_gene_id") %>%
+  rmd_params$dat %>%
+    dplyr::filter(q_value <= rmd_params$significance_cutoff) %>%
+    dplyr::anti_join(dat %>% dplyr::filter(q_value <= rmd_params$significance_cutoff), by = "ensembl_gene_id") %>%
     # Attach gene name from Biomart entry
     rmyknife::attach_biomart(attributes = "external_gene_name", verbose = FALSE) %>%
     knitr::kable() %>%
     print()
   
+  # Print empty string because otherweise the status message will be rendered distorted
+  print("")
   print("Check for genes with duplicated entries. We will consider the ones with the lowest p-value")
 
   dat %<>% add_is_duplicated("EntrezID")
@@ -139,14 +153,14 @@ Also called GO-over represenation test.
 
 # Expect a data set containing q_values and Entrez/Ensembl IDs
 dat_goterms <- dat %>% get_go_all_ontologies(
-  significance_cutoff = params$significance_cutoff,
-  use_background = params$use_background
+  significance_cutoff = rmd_params$significance_cutoff,
+  use_background = rmd_params$use_background
 )
 # Get simplified ontologies if required
-if (params$simplify_ontologies) {
+if (rmd_params$simplify_ontologies) {
   dat_goterms_simplified <- simplify_ontologies(dat_goterms)
 }
-if (params$do_gse) {
+if (rmd_params$do_gse) {
   dat_gse_go <- dat %>% get_gse_all_ontologies()
   dat_gse_kegg <- dat %>% get_kegg()
 } else {
@@ -168,7 +182,7 @@ dat_goterms %>% plot_all_ontologies(fc_symbol)
 ClusterProfiler allows usage of the `simplify` method that removes redundant GO terms. For details, refer to [this blog post](https://guangchuangyu.github.io/2015/10/use-simplify-to-remove-redundancy-of-enriched-go-terms/).
 
 ```{r print_go_ontologies}
-if (params$simplify_ontologies) {
+if (rmd_params$simplify_ontologies) {
   dat_goterms_simplified %>% plot_all_ontologies(fc_symbol)
 } else {
   print("Simplified ontologies deactivated.")
@@ -187,7 +201,7 @@ if (params$simplify_ontologies) {
 * The original paper is [Gene set enrichment analysis: A knowledge-based approach for interpreting genome-wide expression profiles](http://www.pnas.org/content/102/43/15545.long)
 
 ```{r gse_all}
-if (params$do_gse) {
+if (rmd_params$do_gse) {
   dat_gse_go %>% plot_all_ontologies(fc_symbol)
 } else {
   print("GSE analysis disabled")
@@ -199,7 +213,7 @@ if (params$do_gse) {
 Here we apply the GSE analysis to KEGG pathways.
 
 ```{r gse_kegg_all}
-if (params$do_gse) {
+if (rmd_params$do_gse) {
   dat_gse_kegg %>% plot_all_ontologies(fc_symbol)
 } else {
   print("GSE analysis disabled")
@@ -208,17 +222,18 @@ if (params$do_gse) {
 
 ```{r export_result}
 # Create dummy variable for for simplified gene ontologies if we did not calculate it
-if (!params$simplify_ontologies) {
+if (!rmd_params$simplify_ontologies) {
   dat_goterms_simplified <- data.frame()
 }
+
 # Export result
-if (params$save_excel) {
+if (rmd_params$save_excel) {
   export_go_terms_to_excel(
     go_ontologies        = dat_goterms,
     go_ontologies_simple = dat_goterms_simplified,
     gse_ontologies       = dat_gse_go,
     kegg_ontologies      = dat_gse_kegg,
-    path                 = paste0(params$output_path, '/go_terms.xlsx')
+    path                 = paste0(rmd_params$output_path, '/go_terms.xlsx')
   )
 }
 ```
