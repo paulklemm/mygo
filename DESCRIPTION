@@ -3,9 +3,10 @@ Title: Create Report for mus musculus dataset of GO-term analysis using clusterP
 Version: 0.0.2
 Authors@R: 
     person(given = "Paul",
-           family = "Klemm",
-           role = c("aut", "cre"),
-           email = "paul.klemm@posteo.net")
+        family = "Klemm",
+        role = c("aut", "cre"),
+        email = "paul.klemm@sf.mpg.de",
+        comment = c(ORCID = "https://orcid.org/0000-0002-5985-1737"))
 Description: Create Report for mus musculus dataset of GO-term analysis using clusterProfiler
 License: MIT + file LICENSE
 Encoding: UTF-8
