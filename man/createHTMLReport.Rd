@@ -6,7 +6,8 @@
 \usage{
 createHTMLReport(dat, output_path, save_excel = TRUE,
   significance_cutoff = 0.05, do_gse = TRUE,
-  simplify_ontologies = TRUE, use_background = TRUE)
+  simplify_ontologies = TRUE, use_background = TRUE,
+  store_r_objects = TRUE)
 }
 \arguments{
 \item{dat}{Dataframe containing variables \code{q_value} and \code{EntrezID} or \code{EnsemblID}}
@@ -22,6 +23,8 @@ createHTMLReport(dat, output_path, save_excel = TRUE,
 \item{simplify_ontologies}{Run time-consuming ontology simplification}
 
 \item{use_background}{Use background genes for the analysis}
+
+\item{store_r_objects}{Store clusterProfiler R objects as compressed RDS files to output_path}
 }
 \value{
 cummeRbund cuff object

@@ -12,6 +12,7 @@
 - [Debug Run](#debug-run)
 - [Installation](#installation)
 - [Credits](#credits)
+- [History](#history)
 
 <!-- /TOC -->
 
@@ -157,3 +158,8 @@ devtools::install_github("paulklemm/mygo")
 ## Credits
 
 - [clusterProfiler](https://guangchuangyu.github.io/software/clusterProfiler/) by Guangchuang Yu
+
+## History
+
+- *2020-02-04*
+  - Added `store_r_objects` option
