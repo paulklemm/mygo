@@ -16,6 +16,7 @@ params:
   do_gse: TRUE
   use_background: TRUE
   store_r_objects: TRUE
+  simplify_cutoff: 0.7
 ---
 
 # Overview
@@ -49,6 +50,7 @@ rmd_params$simplify_ontologies <- params$simplify_ontologies
 rmd_params$do_gse <- params$do_gse
 rmd_params$use_background <- params$use_background
 rmd_params$store_r_objects <- params$store_r_objects
+rmd_params$simplify_cutoff <- params$simplify_cutoff
 
 library(mygo)
 library(magrittr)
@@ -57,8 +59,8 @@ library(knitr)
 
 # Print settings as table
 tibble::tibble(
-  name = c("output_path", "save_excel", "significance_cutoff", "simplify_ontologies", "do_gse", "use_background", "store r objects"),
-  setting = c(rmd_params$output_path, rmd_params$save_excel, rmd_params$significance_cutoff, rmd_params$simplify_ontologies, rmd_params$do_gse, rmd_params$use_background, rmd_params$store_r_objects)
+  name = c("output_path", "save_excel", "significance_cutoff", "simplify_ontologies", "do_gse", "use_background", "store r objects", "simplify cutoff"),
+  setting = c(rmd_params$output_path, rmd_params$save_excel, rmd_params$significance_cutoff, rmd_params$simplify_ontologies, rmd_params$do_gse, rmd_params$use_background, rmd_params$store_r_objects, rmd_params$simplify_cutoff)
 ) %>%
   knitr::kable()
 
@@ -159,7 +161,10 @@ dat_goterms <- dat %>% get_go_all_ontologies(
 )
 # Get simplified ontologies if required
 if (rmd_params$simplify_ontologies) {
-  dat_goterms_simplified <- simplify_ontologies(dat_goterms)
+  dat_goterms_simplified <- simplify_ontologies(
+    ontologies = dat_goterms,
+    cutoff = rmd_params$simplify_cutoff
+  )
 }
 if (rmd_params$do_gse) {
   dat_gse_go <- dat %>% get_gse_all_ontologies()

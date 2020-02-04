@@ -4,10 +4,12 @@
 \alias{simplify_ontologies}
 \title{Simplify GO terms}
 \usage{
-simplify_ontologies(ontologies)
+simplify_ontologies(ontologies, cutoff)
 }
 \arguments{
 \item{ontologies}{List of clusterProfiler enrichResult objects with elements BP, MF and CC}
+
+\item{cutoff}{See clusterProfiler::simplify}
 }
 \description{
 Simplify GO terms

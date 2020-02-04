@@ -57,6 +57,7 @@ attach_gene_symbol_from_entrez <- function(dat) {
 #' @param do_gse Conduct GSE analysis
 #' @param use_background Use background genes for the analysis
 #' @param store_r_objects Store clusterProfiler R objects as compressed RDS files to output_path
+#' @param simplify_cutoff See clusterProfiler::simplify
 #' @return cummeRbund cuff object
 createHTMLReport <- function(
   dat,
@@ -66,7 +67,8 @@ createHTMLReport <- function(
   do_gse = TRUE,
   simplify_ontologies = TRUE,
   use_background = TRUE,
-  store_r_objects = TRUE
+  store_r_objects = TRUE,
+  simplify_cutoff = 0.7
   ) {
   # https://stackoverflow.com/questions/30377213/how-to-include-rmarkdown-file-in-r-package
   path_to_report <- system.file("rmd/Report.Rmd", package = "mygo")
@@ -81,7 +83,8 @@ createHTMLReport <- function(
       simplify_ontologies = simplify_ontologies,
       do_gse = do_gse,
       use_background = use_background,
-      store_r_objects = store_r_objects
+      store_r_objects = store_r_objects,
+      simplify_cutoff = simplify_cutoff
     ),
     # RMarkdown options
     output_dir = output_path,
@@ -167,11 +170,12 @@ plot_terms_gse <- function(gse_terms, fc_symbol) {
 #' @export
 #' @import clusterProfiler magrittr purrr
 #' @param ontologies List of clusterProfiler enrichResult objects with elements BP, MF and CC
-simplify_ontologies <- function(ontologies) {
+#' @param cutoff See clusterProfiler::simplify
+simplify_ontologies <- function(ontologies, cutoff) {
   ontologies %>%
   purrr::map(function(.x) {
     # Print GO ontology plots
-    .x %>% clusterProfiler::simplify()
+    .x %>% clusterProfiler::simplify(cutoff = cutoff)
   }) %>%
     return()
 }
