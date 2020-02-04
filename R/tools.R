@@ -281,7 +281,6 @@ plot_all_ontologies <- function(ontologies, fc_symbol) {
 }
 
 #' Export list of GO terms to Excel file
-#' TODO: Redo this!
 #'
 #' @export
 #' @import WriteXLS tibble magrittr
@@ -290,19 +289,39 @@ plot_all_ontologies <- function(ontologies, fc_symbol) {
 #' @param gse_ontologies GSE enrichResult
 #' @param kegg_ontologies KEGG enrichResult
 #' @param path Path to exported excel file
-export_go_terms_to_excel <- function(go_ontologies, go_ontologies_simple, gse_ontologies, kegg_ontologies, path) {
-  BP_go <- go_ontologies$Biological_Process %>% as.tibble()
-  MF_go <- go_ontologies$Molecular_Function %>% as.tibble()
-  CC_go <- go_ontologies$Cellular_Components %>% as.tibble()
-  BP_go_simple <- go_ontologies_simple$Biological_Process %>% as.tibble()
-  MF_go_simple <- go_ontologies_simple$Molecular_Function %>% as.tibble()
-  CC_go_simple <- go_ontologies_simple$Cellular_Components %>% as.tibble()
-  BP_gse <- gse_ontologies$Biological_Process %>% as.tibble()
-  MF_gse <- gse_ontologies$Molecular_Function %>% as.tibble()
-  CC_gse <- gse_ontologies$Cellular_Components %>% as.tibble()
-  kegg_gse <- kegg_ontologies$kegg %>% as.tibble()
+#' @param species Either "MUS" or "HUM"
+export_go_terms_to_excel <- function(
+  go_ontologies,
+  go_ontologies_simple,
+  gse_ontologies,
+  kegg_ontologies,
+  path,
+  species = "MUS"
+) {
+  # Add count for each GO-term and calculate overlap ratio of significant genes
+  attach_goterm_genecount <- function(dat) {
+    dat %>%
+      tibble::as_tibble() %>%
+      dplyr::rowwise() %>%
+      dplyr::mutate(
+        GOTermGeneCount = rmyknife::get_genes_of_goterm_godb(ID, species = species, verbose = FALSE) %>% length(),
+        Percent_Significant = (Count * 100) / GOTermGeneCount
+      ) %>%
+      return()
+  }
+  BP_go <- go_ontologies$Biological_Process %>% attach_goterm_genecount()
+  MF_go <- go_ontologies$Molecular_Function %>% attach_goterm_genecount()
+  CC_go <- go_ontologies$Cellular_Components %>% attach_goterm_genecount()
+  BP_go_simple <- go_ontologies_simple$Biological_Process %>% attach_goterm_genecount()
+  MF_go_simple <- go_ontologies_simple$Molecular_Function %>% attach_goterm_genecount()
+  CC_go_simple <- go_ontologies_simple$Cellular_Components %>% attach_goterm_genecount()
+  BP_gse <- gse_ontologies$Biological_Process %>% attach_goterm_genecount()
+  MF_gse <- gse_ontologies$Molecular_Function %>% attach_goterm_genecount()
+  CC_gse <- gse_ontologies$Cellular_Components %>% attach_goterm_genecount()
+  kegg_gse <- kegg_ontologies$kegg %>% attach_goterm_genecount()
 
-  c('BP_go', 'MF_go', 'CC_go', 'BP_go_simple', 'MF_go_simple', 'CC_go_simple', 'BP_gse', 'MF_gse', 'CC_gse', 'kegg_gse') %>%
+  c('BP_go',
+  'MF_go', 'CC_go', 'BP_go_simple', 'MF_go_simple', 'CC_go_simple', 'BP_gse', 'MF_gse', 'CC_gse', 'kegg_gse') %>%
     WriteXLS::WriteXLS(ExcelFileName = path,
       AdjWidth = TRUE,
       AutoFilter = TRUE,
