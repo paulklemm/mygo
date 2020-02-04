@@ -304,14 +304,20 @@ export_go_terms_to_excel <- function(
 ) {
   # Add count for each GO-term and calculate overlap ratio of significant genes
   attach_goterm_genecount <- function(dat) {
-    dat %>%
-      tibble::as_tibble() %>%
-      dplyr::rowwise() %>%
-      dplyr::mutate(
-        GOTermGeneCount = rmyknife::get_genes_of_goterm_godb(ID, species = species, verbose = FALSE) %>% length(),
-        Percent_Significant = (Count * 100) / GOTermGeneCount
-      ) %>%
-      return()
+    dat_tibble <- dat %>%
+      tibble::as_tibble()
+    # Check if we have a populated dataframe
+    if (dat_tibble %>% nrow() > 0) {
+      dat_tibble %>%
+        dplyr::rowwise() %>%
+        dplyr::mutate(
+          GOTermGeneCount = rmyknife::get_genes_of_goterm_godb(ID, species = species, verbose = FALSE) %>% length(),
+          Percent_Significant = (Count * 100) / GOTermGeneCount
+        ) %>%
+        return()
+    } else {
+      return(dat_tibble)
+    }
   }
   BP_go <- go_ontologies$Biological_Process %>% attach_goterm_genecount()
   MF_go <- go_ontologies$Molecular_Function %>% attach_goterm_genecount()
@@ -324,8 +330,7 @@ export_go_terms_to_excel <- function(
   CC_gse <- gse_ontologies$Cellular_Components %>% attach_goterm_genecount()
   kegg_gse <- kegg_ontologies$kegg %>% attach_goterm_genecount()
 
-  c('BP_go',
-  'MF_go', 'CC_go', 'BP_go_simple', 'MF_go_simple', 'CC_go_simple', 'BP_gse', 'MF_gse', 'CC_gse', 'kegg_gse') %>%
+  c('BP_go', 'MF_go', 'CC_go', 'BP_go_simple', 'MF_go_simple', 'CC_go_simple', 'BP_gse', 'MF_gse', 'CC_gse', 'kegg_gse') %>%
     WriteXLS::WriteXLS(ExcelFileName = path,
       AdjWidth = TRUE,
       AutoFilter = TRUE,
