@@ -8,3 +8,4 @@ result/
 *.html
 Report_files/
 figure/
+dat_goterms.rds

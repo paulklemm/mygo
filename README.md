@@ -137,11 +137,12 @@ xaringan::infinite_moon_reader(
   params = list(
     dat = my_dat,
     output_path = ".",
-    save_excel = TRUE,
+    save_excel = FALSE,
     significance_cutoff = 0.05,
     simplify_ontologies = FALSE,
     do_gse = FALSE,
-    use_background = TRUE
+    use_background = TRUE,
+    store_r_objects = FALSE
   )
 )
 

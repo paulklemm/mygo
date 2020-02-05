@@ -2,11 +2,10 @@
 title: GO-Term Analysis
 date: "`r Sys.Date()`"
 output:
-  flexdashboard::flex_dashboard:
-    fig_width: 14
-    fig_height: 10
-    toc_float: yes
+  html_notebook:
     code_folding: hide
+    fig_width: 12
+    fig_height: 6
 params:
   dat: ''
   output_path: '.'
@@ -19,22 +18,11 @@ params:
   simplify_cutoff: 0.7
 ---
 
-# Overview
+## {.tabset}
 
-## Column {.tabset}
+### Data Overview
 
-Conduct GO-term analysis using [clusterProfiler](https://guangchuangyu.github.io/software/clusterProfiler/) and print report.
-
-### Restrictions & Data Preparations
-
-Currently only `mus musculus` datasets are supported.
-
-The data frame input needs to have the following dimensions:
-
-- `ensembl_gene_id` or `EntrezID` (`character`)
-- `q_value` (`numeric`)
-- `fc` (`numeric`)
-- `Symbol` (`character`) (optional, but it's easier to identify genes that cannot be associated with an EntrezID)
+Settings
 
 ```{r setup, echo = FALSE, message = TRUE, warning = TRUE, results = 'asis'}
 
@@ -52,14 +40,13 @@ rmd_params$use_background <- params$use_background
 rmd_params$store_r_objects <- params$store_r_objects
 rmd_params$simplify_cutoff <- params$simplify_cutoff
 
-library(mygo)
 library(magrittr)
-library(tibble)
-library(knitr)
+suppressWarnings(library(mygo))
+suppressWarnings(library(rmyknife))
 
 # Print settings as table
 tibble::tibble(
-  name = c("output_path", "save_excel", "significance_cutoff", "simplify_ontologies", "do_gse", "use_background", "store r objects", "simplify cutoff"),
+  name = c("output_path", "save_excel", "significance_cutoff", "simplify_ontologies", "do_gse", "use_background", "store_r_objects", "simplify_cutoff"),
   setting = c(rmd_params$output_path, rmd_params$save_excel, rmd_params$significance_cutoff, rmd_params$simplify_ontologies, rmd_params$do_gse, rmd_params$use_background, rmd_params$store_r_objects, rmd_params$simplify_cutoff)
 ) %>%
   knitr::kable()
@@ -69,7 +56,9 @@ print("Data table head:")
 rmd_params$dat %>%
   head() %>%
   knitr::kable()
-paste0("dat contains ", rmd_params$dat %>% nrow(), " rows.")
+
+paste0("dat contains ", rmd_params$dat %>% nrow(), " rows.") %>%
+  message()
 
 if (!('q_value' %in% colnames(rmd_params$dat))) {
   stop('Column `q_value` not found in data frame')
@@ -86,7 +75,7 @@ if (!('EntrezID' %in% colnames(rmd_params$dat))) {
   
   # Get regulated genes that don't have a EntrezID
   # https://github.sf.mpg.de/bruening-lab/2018-01-Weiyi-Differential-Gene-Expression-Analysis/blob/master/Analysis_DESeq.Rmd
-  print("Regulated genes that do not map to a EntrezID")
+  message("Regulated genes that do not map to a EntrezID")
   rmd_params$dat %>%
     dplyr::filter(q_value <= rmd_params$significance_cutoff) %>%
     dplyr::anti_join(dat %>% dplyr::filter(q_value <= rmd_params$significance_cutoff), by = "ensembl_gene_id") %>%
@@ -95,7 +84,7 @@ if (!('EntrezID' %in% colnames(rmd_params$dat))) {
     knitr::kable() %>%
     print()
   
-  print("Check for genes with duplicated entries. We will consider the ones with the lowest p-value")
+  message("Check for genes with duplicated entries. We will consider the ones with the lowest p-value")
 
   dat %<>% add_is_duplicated("EntrezID")
   dat %>%
@@ -121,7 +110,7 @@ if (!('EntrezID' %in% colnames(rmd_params$dat))) {
 }
 # Get names vector from EntrezIDs
 # dat %<>% attach_gene_symbol_from_entrez()
-# Named double vector of fold changes named after the gene symbol 
+# Named double vector of fold changes named after the gene symbol
 fc_symbol <- dat %>%
   .$fc %>%
   as.double() %>%
@@ -130,27 +119,53 @@ fc_symbol <- dat %>%
 
 ### Volcano Plot
 
-To get a general feeling for the data we plot the differential expression analysis result as Volcano Plot.
+```{r volcano_plot_ggplot}
 
-```{r volcano_plot}
-dat %>% volcano_plot()
+dat %>%
+  # Draw Volcano plot
+  ggplot2::ggplot(
+    ggplot2::aes(
+      x = fc,
+      y = -log10(q_value),
+      color = (q_value <= 0.05) %>% ifelse(., "significant", "not significant")
+    )
+  ) +
+    ggplot2::geom_point(
+      alpha = 0.3,
+      size = 0.5
+    ) +
+    ggplot2::scale_color_manual(values = c("grey", "blue")) +
+    ggplot2::xlab(expression(log[2](fc))) + 
+    ggplot2::ylab(expression(-log[10](adjusted~p~value))) +
+    ggplot2::labs(colour = "Significance") +
+    ggthemes::theme_tufte(base_family = "sans") +
+    ggrepel::geom_text_repel(
+      data = . %>%
+        dplyr::arrange(q_value) %>%
+        head(10),
+      mapping = ggplot2::aes(label = Symbol),
+      size = 3
+    ) +
+    ggplot2::geom_hline(
+      yintercept = -log10(0.05),
+      linetype = "dotted"
+    )
+
 ```
 
-# GO-Term Analysis
+### GO-Term All
 
-## Column {.tabset}
+Gene-Ontology (GO)-term analysis is also called a GO-over represenation test.
 
-### Overview
+We use the over-representation test implemented in clusterProfiler and [described here](https://bioconductor.org/packages/release/bioc/vignettes/clusterProfiler/inst/doc/clusterProfiler.html#go-over-representation-test)
 
-Also called GO-over represenation test.
+The over-representation test is carried out internally with the DOSE package and is [described here](https://bioconductor.org/packages/release/bioc/vignettes/DOSE/inst/doc/enrichmentAnalysis.html#over-representation-analysis)
 
-* We use the over-representation test implemented in clusterProfiler and [described here](https://bioconductor.org/packages/release/bioc/vignettes/clusterProfiler/inst/doc/clusterProfiler.html#go-over-representation-test)
-* The over-representation test is carried out internally with the DOSE package and is [described here](https://bioconductor.org/packages/release/bioc/vignettes/DOSE/inst/doc/enrichmentAnalysis.html#over-representation-analysis)
-* For details on the hypergeometric distribution, refer to [GO::TermFinder—open source software for accessing Gene Ontology information and finding significantly enriched Gene Ontology terms associated with a list of genes](https://academic.oup.com/bioinformatics/article/20/18/3710/202612)
-  * Hypergeometric distribution is a distribution modelling normally distributed probabilities (e.g. red, blue and green marbles in a Urn) -- [Wiki](https://de.wikipedia.org/wiki/Hypergeometrische_Verteilung)
-  * Freely spoken, DOSE determines whether any terms annotated by the list of differentially expressed genes is greater than the one expected by chance in a term
+For details on the hypergeometric distribution, refer to [GO::TermFinder—open source software for accessing Gene Ontology information and finding significantly enriched Gene Ontology terms associated with a list of genes](https://academic.oup.com/bioinformatics/article/20/18/3710/202612)
 
-### All
+  - Hypergeometric distribution is a distribution modelling normally distributed probabilities (e.g. red, blue and green marbles in a Urn) -- [Wiki](https://de.wikipedia.org/wiki/Hypergeometrische_Verteilung)
+  - Freely spoken, DOSE determines whether any terms annotated by the list of differentially expressed genes is greater than the one expected by chance in a term
+
 
 ```{r get_go_and_gse}
 
@@ -183,7 +198,7 @@ if (rmd_params$do_gse) {
 dat_goterms %>% plot_all_ontologies(fc_symbol)
 ```
 
-### Simplified
+### GO-Term Simplified
 
 ClusterProfiler allows usage of the `simplify` method that removes redundant GO terms. For details, refer to [this blog post](https://guangchuangyu.github.io/2015/10/use-simplify-to-remove-redundancy-of-enriched-go-terms/).
 
@@ -194,10 +209,6 @@ if (rmd_params$simplify_ontologies) {
   print("Simplified ontologies deactivated.")
 }
 ```
-
-# Gene Set Enrichment (GSE) Analysis
-
-## Column {.tabset}
 
 ### GSE GO Analysis
 
