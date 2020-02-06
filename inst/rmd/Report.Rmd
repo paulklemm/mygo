@@ -18,6 +18,33 @@ params:
   simplify_cutoff: 0.7
 ---
 
+**Don't Panic**.
+
+There is a lot of stuff in this document, just go through it step by step and try not not deal with everything at once.
+Here is what you should do.
+
+1. Check the Data Overview
+
+We need to attach [EntrezID](https://www.ncbi.nlm.nih.gov/gene/)'s to each gene to conduct a GO-term or GSEA analysis.
+However, for some genes this might fail, because no data base so far contains all known genes and transcripts.
+Please check the section "Regulated genes that do not map to a EntrezID" in the *Data Overview* tab if there are genes that are important to you and that have no EntrezID assigned.
+
+2. Check the Volcano plot.
+
+Does the Volcano plot like you would expect?
+
+3. Check GO-terms (*GO-Term All*)
+
+The GO-term overrepresentation analysis uses all significant genes of your data set.
+Check the figures and see if you find something interesting.
+If there are too many GO-terms or they are too redundant, please check *GO-Term Simplified*.
+
+4. Optional: Check *GSE GO Analysis*
+
+A GSE uses _all_ detected genes and their fold change, rather than only the significant ones.
+**This you should only do if there is absolutely nothing of interest in your GO-term analysis**.
+You can also use this if you have a very subtle treatment and you expect very small genetic changes.
+
 ## {.tabset}
 
 ### Data Overview
@@ -42,6 +69,12 @@ rmd_params$simplify_cutoff <- params$simplify_cutoff
 
 library(magrittr)
 suppressWarnings(library(mygo))
+suppressWarnings(library(enrichplot))
+suppressWarnings(library(org.Mm.eg.db))
+suppressWarnings(library(AnnotationDbi))
+suppressWarnings(library(stats4))
+suppressWarnings(library(BiocGenerics))
+suppressWarnings(library(parallel))
 suppressWarnings(library(rmyknife))
 
 # Print settings as table
@@ -52,13 +85,10 @@ tibble::tibble(
   knitr::kable()
 
 # Summary for parameter file
-print("Data table head:")
+message("Data table head")
 rmd_params$dat %>%
   head() %>%
   knitr::kable()
-
-paste0("dat contains ", rmd_params$dat %>% nrow(), " rows.") %>%
-  message()
 
 if (!('q_value' %in% colnames(rmd_params$dat))) {
   stop('Column `q_value` not found in data frame')
@@ -118,6 +148,13 @@ fc_symbol <- dat %>%
 ```
 
 ### Volcano Plot
+
+Dataset summary
+
+- We count `r nrow(dat)` genes.
+- `r dplyr::filter(dat, q_value <= 0.05) %>% nrow()` genes are significantly regulated.
+- `r dplyr::filter(dat, q_value <= 0.05 & fc > 0) %>% nrow()` genes are significantly up-regulated.
+- `r dplyr::filter(dat, q_value <= 0.05 & fc < 0) %>% nrow()` genes are significantly down-regulated.
 
 ```{r volcano_plot_ggplot}
 
