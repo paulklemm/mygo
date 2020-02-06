@@ -240,8 +240,93 @@ if (rmd_params$do_gse) {
 ```
 
 ```{r plot_go}
-dat_goterms %>% plot_all_ontologies(fc_symbol)
+
+# dat_goterms %>% plot_all_ontologies(fc_symbol)
+
 ```
+
+#### Biological Process
+
+Here is the list of all regulated GO-terms sorted by significance.
+
+```{r bp_print_table}
+#' Helper function, takes clusterProfiler GO-term result and prints it as DT widget
+#' @export
+#' @import DT dplyr tibble magrittr
+#' @param dat clusterProfiler GO-term result
+print_goterm_as_datatable <- function(dat) {
+  dat %>%
+    tibble::as_tibble() %>%
+    dplyr::select(-geneID, -pvalue, -p.adjust) %>%
+    DT::datatable(
+      extensions = 'Buttons',
+      options = list(
+        dom = 'Bfrtip',
+        buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
+      ),
+      filter = "top"
+    ) %>%
+    return()
+}
+dat_goterms$Biological_Process %>%
+  print_goterm_as_datatable()
+  
+```
+
+The Enrich Map plot shows overlapping genes between GO-terms as grey edged between each node.
+Each node represents a regulated GO-term.
+Only the top 50 regulated GO-terms are plotted here.
+
+```{r bp_emap, fig.width = 14, fig.height = 14}
+
+dat_goterms$Biological_Process %>%
+  mygo::emap_plot('Enrich Map Plot Plot', 50)
+
+```
+
+The following scatter plot displays all regulated GO-terms w.r.t total GO-term gene count (GO-term size) on the x-axis and percentage of significant genes (how many of the GO-term genes are significantly regulated) on the y-axis.
+The top 15 regulated GO-terms are labeled.
+
+```{r bp_overlap_scatterplot, fig.width = 14, fig.height = 10}
+
+dat_goterms$Biological_Process %>%
+  mygo::attach_goterm_genecount(species = "MUS") %>%
+  mygo::overlap_scatterplot()
+
+```
+
+#### Molecular Function
+
+```{r mf_print_table}
+dat_goterms$Molecular_Function %>%
+  print_goterm_as_datatable()
+```
+```{r mf_emap, fig.width = 14, fig.height = 14}
+dat_goterms$Molecular_Function %>%
+  mygo::emap_plot('Enrich Map Plot Plot', 50)
+```
+```{r mf_overlap_scatterplot, fig.width = 14, fig.height = 10}
+dat_goterms$Molecular_Function %>%
+  mygo::attach_goterm_genecount(species = "MUS") %>%
+  mygo::overlap_scatterplot()
+```
+
+#### Cellular Components
+
+```{r cc_print_table}
+dat_goterms$Cellular_Components %>%
+  print_goterm_as_datatable()
+```
+```{r cc_emap, fig.width = 14, fig.height = 14}
+dat_goterms$Cellular_Components %>%
+  mygo::emap_plot('Enrich Map Plot Plot', 50)
+```
+```{r cc_overlap_scatterplot, fig.width = 14, fig.height = 10}
+dat_goterms$Cellular_Components %>%
+  mygo::attach_goterm_genecount(species = "MUS") %>%
+  mygo::overlap_scatterplot()
+```
+
 
 ### GO-Term Simplified
 

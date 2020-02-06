@@ -100,13 +100,17 @@ createHTMLReport <- function(
 #' Create clusterProfiler EMA plot from go term
 #'
 #' @import magrittr clusterProfiler ggplot2 enrichplot
+#' @export
 #' @param go_terms clusterProfiler enrichResult object
 #' @param title ggtitle of the plot
-emap_plot <- function(go_terms, title) {
+#' @param n Number of GO-term to plot
+emap_plot <- function(go_terms, title, n = 30) {
   # There is a bug with very small GO term selections that we have to catch
   # HACK
   if (go_terms %>% nrow() > 5) {
-    plot <- go_terms %>% enrichplot::emapplot() + ggplot2::ggtitle(title)
+    plot <- go_terms %>%
+      enrichplot::emapplot(showCategory = n) +
+      ggplot2::ggtitle(title)
     return(plot)
   }
 }
@@ -186,7 +190,7 @@ simplify_ontologies <- function(ontologies, cutoff) {
 #' @import magrittr clusterProfiler org.Mm.eg.db
 #' @param ontology Can be either "BP", "CC", "MF"
 #' @param entrezgenes List of entrezgenes to use for GO analysis
-#' @param entrez_background_genes List of background genes 
+#' @param entrez_background_genes List of background genes
 #' @param use_background use specified background genes
 perform_enrichGO <- function(ontology, entrezgenes, background_genes, use_background) {
   if (use_background) {
@@ -284,6 +288,32 @@ plot_all_ontologies <- function(ontologies, fc_symbol) {
   })
 }
 
+
+#' Add count for each GO-term and calculate overlap ratio of significant genes
+#' @export
+#' @import dplyr magrittr tibble
+#' @param dat clusterProfiler GO-term result
+#' @param species Either "MUS" or "HUM"
+attach_goterm_genecount <- function(
+  dat,
+  species = "MUS"
+) {
+  dat_tibble <- dat %>%
+    tibble::as_tibble()
+  # Check if we have a populated dataframe
+  if (dat_tibble %>% nrow() > 0) {
+    dat_tibble %>%
+      dplyr::rowwise() %>%
+      dplyr::mutate(
+        GOTermGeneCount = rmyknife::get_genes_of_goterm_godb(ID, species = species, verbose = FALSE) %>% length(),
+        Percent_Significant = (Count * 100) / GOTermGeneCount
+      ) %>%
+      return()
+  } else {
+    return(dat_tibble)
+  }
+}
+
 #' Export list of GO terms to Excel file
 #'
 #' @export
@@ -302,23 +332,6 @@ export_go_terms_to_excel <- function(
   path,
   species = "MUS"
 ) {
-  # Add count for each GO-term and calculate overlap ratio of significant genes
-  attach_goterm_genecount <- function(dat) {
-    dat_tibble <- dat %>%
-      tibble::as_tibble()
-    # Check if we have a populated dataframe
-    if (dat_tibble %>% nrow() > 0) {
-      dat_tibble %>%
-        dplyr::rowwise() %>%
-        dplyr::mutate(
-          GOTermGeneCount = rmyknife::get_genes_of_goterm_godb(ID, species = species, verbose = FALSE) %>% length(),
-          Percent_Significant = (Count * 100) / GOTermGeneCount
-        ) %>%
-        return()
-    } else {
-      return(dat_tibble)
-    }
-  }
   BP_go <- go_ontologies$Biological_Process %>% attach_goterm_genecount()
   MF_go <- go_ontologies$Molecular_Function %>% attach_goterm_genecount()
   CC_go <- go_ontologies$Cellular_Components %>% attach_goterm_genecount()
@@ -411,4 +424,39 @@ perform_gseGO <- function(ontology, fc) {
 perform_gseKEGG <- function(fc) {
   fc %>% clusterProfiler::gseKEGG(nPerm = 10000, organism = 'mmu') %>%
     return()
+}
+
+#' Plot total gene count against percentage of significant genes
+#' @export
+#' @import ggrepel ggplot2 magrittr dplyr ggthemes
+#' @param dat clusterProfiler GO-term table with attached GOTermGeneCount and Percent_Significant column
+#' @param n Number of GO-terms to label
+#' @examples
+#'   dat_goterms$Biological_Process %>%
+#'     mygo::attach_goterm_genecount(species = "MUS") %>%
+#'     overlap_scatterplot
+overlap_scatterplot <- function(
+  dat,
+  n = 15
+) {
+  plot <- dat %>%
+    ggplot2::ggplot(
+      mapping = ggplot2::aes(
+        x = GOTermGeneCount,
+        y = Percent_Significant,
+        color = qvalue
+      )
+    ) +
+    ggplot2::geom_point(alpha = 0.6) +
+    ggplot2::scale_color_continuous(high = "#132B43", low = "#56B1F7") +
+    ggrepel::geom_label_repel(
+      data = . %>% dplyr::arrange(qvalue) %>% head(n),
+      mapping = ggplot2::aes(label = Description),
+      color = "black",
+      min.segment.length = 0
+    ) +
+    ggthemes::theme_tufte(base_family = "Sans") +
+    ggplot2::xlab("Total GO-term gene count") + 
+    ggplot2::ylab("Percentage of significant genes")
+  return(plot)
 }

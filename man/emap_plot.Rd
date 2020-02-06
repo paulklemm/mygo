@@ -4,12 +4,14 @@
 \alias{emap_plot}
 \title{Create clusterProfiler EMA plot from go term}
 \usage{
-emap_plot(go_terms, title)
+emap_plot(go_terms, title, n = 30)
 }
 \arguments{
 \item{go_terms}{clusterProfiler enrichResult object}
 
 \item{title}{ggtitle of the plot}
+
+\item{n}{Number of GO-term to plot}
 }
 \description{
 Create clusterProfiler EMA plot from go term
