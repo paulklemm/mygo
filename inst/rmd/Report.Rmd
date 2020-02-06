@@ -51,6 +51,8 @@ You can also use this if you have a very subtle treatment and you expect very sm
 
 Settings
 
+<details>
+
 ```{r setup, echo = FALSE, message = TRUE, warning = TRUE, results = 'asis'}
 
 # Retreive parameter settings
@@ -95,6 +97,12 @@ if (!('q_value' %in% colnames(rmd_params$dat))) {
 } else if (!('fc' %in% colnames(rmd_params$dat))) {
   stop('Column `fc` not found in data frame')
 }
+
+```
+
+</details>
+
+```{r attach_entrez_id, results = 'asis'}
 
 # Filter significant genes
 if (!('EntrezID' %in% colnames(rmd_params$dat))) {
