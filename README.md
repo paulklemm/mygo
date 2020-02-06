@@ -162,6 +162,8 @@ devtools::install_github("paulklemm/mygo")
 
 ## History
 
+- *2020-02-05-06*
+  - Completely overhaul mygo output
 - *2020-02-04*
   - Added `store_r_objects` option
   - Added `simplify_cutoff` option. See [https://guangchuangyu.github.io/2015/10/use-simplify-to-remove-redundancy-of-enriched-go-terms/](https://guangchuangyu.github.io/2015/10/use-simplify-to-remove-redundancy-of-enriched-go-terms/)
