@@ -141,7 +141,7 @@ if (!('EntrezID' %in% colnames(rmd_params$dat))) {
   .temp_multiple_entries <- dat %>% add_is_duplicated('EntrezID') %>% dplyr::filter(EntrezID_is_duplicated == T)
   if (nrow(.temp_multiple_entries) > 0) {
     warning("Duplicates per EntrezID, check input data")
-    .temp_multiple_entries %>% kable()
+    .temp_multiple_entries %>% knitr::kable()
   }
   # Remove obsolete rows
   dat %<>% dplyr::select(-EntrezID_is_duplicated)
@@ -239,12 +239,6 @@ if (rmd_params$do_gse) {
 }
 ```
 
-```{r plot_go}
-
-# dat_goterms %>% plot_all_ontologies(fc_symbol)
-
-```
-
 #### Biological Process
 
 Here is the list of all regulated GO-terms sorted by significance.
@@ -330,13 +324,78 @@ dat_goterms$Cellular_Components %>%
 
 ### GO-Term Simplified
 
-ClusterProfiler allows usage of the `simplify` method that removes redundant GO terms. For details, refer to [this blog post](https://guangchuangyu.github.io/2015/10/use-simplify-to-remove-redundancy-of-enriched-go-terms/).
+If the number of GO-terms is overwhelming, we can simplify them by removing redundant terms.
+For details, refer to [this blog post](https://guangchuangyu.github.io/2015/10/use-simplify-to-remove-redundancy-of-enriched-go-terms/).
 
 ```{r print_go_ontologies}
+if (!rmd_params$simplify_ontologies) {
+  message("Simplified ontologies deactivated.")
+}
+```
+
+#### Biological Process
+
+```{r bp_simple_print_table}
 if (rmd_params$simplify_ontologies) {
-  dat_goterms_simplified %>% plot_all_ontologies(fc_symbol)
-} else {
-  print("Simplified ontologies deactivated.")
+  dat_goterms_simplified$Biological_Process %>%
+    print_goterm_as_datatable()
+}
+```
+```{r bp_simple_emap, fig.width = 14, fig.height = 14}
+if (rmd_params$simplify_ontologies) {
+  dat_goterms_simplified$Biological_Process %>%
+    mygo::emap_plot('Enrich Map Plot Plot', 50)
+}
+```
+```{r bp_simple_overlap_scatterplot, fig.width = 14, fig.height = 10}
+if (rmd_params$simplify_ontologies) {
+  dat_goterms_simplified$Biological_Process %>%
+    mygo::attach_goterm_genecount(species = "MUS") %>%
+    mygo::overlap_scatterplot()
+}
+```
+
+#### Molecular Function
+
+```{r mf_simple_print_table}
+if (rmd_params$simplify_ontologies) {
+  dat_goterms_simplified$Molecular_Function %>%
+    print_goterm_as_datatable()
+}
+```
+```{r mf_simple_emap, fig.width = 14, fig.height = 14}
+if (rmd_params$simplify_ontologies) {
+  dat_goterms_simplified$Molecular_Function %>%
+    mygo::emap_plot('Enrich Map Plot Plot', 50)
+}
+```
+```{r mf_simple_overlap_scatterplot, fig.width = 14, fig.height = 10}
+if (rmd_params$simplify_ontologies) {
+  dat_goterms_simplified$Molecular_Function %>%
+    mygo::attach_goterm_genecount(species = "MUS") %>%
+    mygo::overlap_scatterplot()
+}
+```
+
+#### Cellular Components
+
+```{r cc_simple_print_table}
+if (rmd_params$simplify_ontologies) {
+  dat_goterms_simplified$Cellular_Components %>%
+    print_goterm_as_datatable()
+}
+```
+```{r cc_simple_emap, fig.width = 14, fig.height = 14}
+if (rmd_params$simplify_ontologies) {
+  dat_goterms_simplified$Cellular_Components %>%
+    mygo::emap_plot('Enrich Map Plot Plot', 50)
+}
+```
+```{r cc_simple_overlap_scatterplot, fig.width = 14, fig.height = 10}
+if (rmd_params$simplify_ontologies) {
+  dat_goterms_simplified$Cellular_Components %>%
+    mygo::attach_goterm_genecount(species = "MUS") %>%
+    mygo::overlap_scatterplot()
 }
 ```
 
