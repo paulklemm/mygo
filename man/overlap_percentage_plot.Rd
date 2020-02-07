@@ -5,7 +5,7 @@
 \title{Plot top n GO-terms w.r.t percentage of significant genes
 Plot adapted from https://yulab-smu.github.io/clusterProfiler-book/chapter13.html}
 \usage{
-overlap_percentage_plot(dat, n = 20)
+overlap_percentage_plot(dat, n = 25)
 }
 \arguments{
 \item{dat}{clusterProfiler GO-term table with attached GOTermGeneCount and Percent_Significant column}

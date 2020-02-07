@@ -142,7 +142,8 @@ xaringan::infinite_moon_reader(
     simplify_ontologies = FALSE,
     do_gse = FALSE,
     use_background = TRUE,
-    store_r_objects = FALSE
+    store_r_objects = FALSE,
+    save_plots_as_pdf = FALSE
   )
 )
 
@@ -161,7 +162,8 @@ devtools::install_github("paulklemm/mygo")
 - [clusterProfiler](https://guangchuangyu.github.io/software/clusterProfiler/) by Guangchuang Yu
 
 ## History
-
+- *2020-02-07*
+  - Added `save_plots_as_pdf` option
 - *2020-02-05-06*
   - Completely overhaul mygo output
 - *2020-02-04*

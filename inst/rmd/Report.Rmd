@@ -16,6 +16,7 @@ params:
   use_background: TRUE
   store_r_objects: TRUE
   simplify_cutoff: 0.7
+  save_plots_as_pdf: TRUE
 ---
 
 **Don't Panic**.
@@ -68,6 +69,7 @@ rmd_params$do_gse <- params$do_gse
 rmd_params$use_background <- params$use_background
 rmd_params$store_r_objects <- params$store_r_objects
 rmd_params$simplify_cutoff <- params$simplify_cutoff
+rmd_params$save_plots_as_pdf <- params$save_plots_as_pdf
 
 library(magrittr)
 suppressWarnings(library(mygo))
@@ -81,8 +83,8 @@ suppressWarnings(library(rmyknife))
 
 # Print settings as table
 tibble::tibble(
-  name = c("output_path", "save_excel", "significance_cutoff", "simplify_ontologies", "do_gse", "use_background", "store_r_objects", "simplify_cutoff"),
-  setting = c(rmd_params$output_path, rmd_params$save_excel, rmd_params$significance_cutoff, rmd_params$simplify_ontologies, rmd_params$do_gse, rmd_params$use_background, rmd_params$store_r_objects, rmd_params$simplify_cutoff)
+  name = c("output_path", "save_excel", "significance_cutoff", "simplify_ontologies", "do_gse", "use_background", "store_r_objects", "simplify_cutoff", "save_plots_as_pdf"),
+  setting = c(rmd_params$output_path, rmd_params$save_excel, rmd_params$significance_cutoff, rmd_params$simplify_ontologies, rmd_params$do_gse, rmd_params$use_background, rmd_params$store_r_objects, rmd_params$simplify_cutoff, rmd_params$save_plots_as_pdf)
 ) %>%
   knitr::kable()
 
@@ -96,6 +98,17 @@ if (!('q_value' %in% colnames(rmd_params$dat))) {
   stop('Column `q_value` not found in data frame')
 } else if (!('fc' %in% colnames(rmd_params$dat))) {
   stop('Column `fc` not found in data frame')
+}
+
+if (rmd_params$save_plots_as_pdf) {
+  # Create path for plots
+  file.path(rmd_params$output_path, "plots") %>%
+    dir.create()
+  # https://stackoverflow.com/questions/27992239/knitr-include-figures-in-report-and-output-figures-to-separate-files#comment71370705_27996644
+  knitr::opts_chunk$set(
+    dev = c("png", "pdf"),
+    fig.path = paste0(file.path(rmd_params$output_path, "plots"), .Platform$file.sep)
+  )
 }
 
 ```

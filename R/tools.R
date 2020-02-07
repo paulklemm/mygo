@@ -58,6 +58,7 @@ attach_gene_symbol_from_entrez <- function(dat) {
 #' @param use_background Use background genes for the analysis
 #' @param store_r_objects Store clusterProfiler R objects as compressed RDS files to output_path
 #' @param simplify_cutoff See clusterProfiler::simplify
+#' @param save_plots_as_pdf Export all plots as PDF to output_path/plots
 #' @return cummeRbund cuff object
 createHTMLReport <- function(
   dat,
@@ -68,7 +69,8 @@ createHTMLReport <- function(
   simplify_ontologies = TRUE,
   use_background = TRUE,
   store_r_objects = TRUE,
-  simplify_cutoff = 0.7
+  simplify_cutoff = 0.7,
+  save_plots_as_pdf = TRUE
   ) {
   # https://stackoverflow.com/questions/30377213/how-to-include-rmarkdown-file-in-r-package
   path_to_report <- system.file("rmd/Report.Rmd", package = "mygo")
@@ -84,7 +86,8 @@ createHTMLReport <- function(
       do_gse = do_gse,
       use_background = use_background,
       store_r_objects = store_r_objects,
-      simplify_cutoff = simplify_cutoff
+      simplify_cutoff = simplify_cutoff,
+      save_plots_as_pdf = save_plots_as_pdf
     ),
     # RMarkdown options
     output_dir = output_path,
@@ -484,7 +487,7 @@ overlap_scatterplot <- function(
 #'   dat_goterms$Biological_Process %>%
 #'     mygo::attach_goterm_genecount() %>%
 #'     mygo::overlap_percentage_plot()
-overlap_percentage_plot <- function(dat, n = 20) {
+overlap_percentage_plot <- function(dat, n = 25) {
   if (dat %>% nrow() == 0) {
     warning("Cannot create overlap percentage plot for empty data frame")
     return()

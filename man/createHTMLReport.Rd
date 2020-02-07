@@ -7,7 +7,8 @@
 createHTMLReport(dat, output_path, save_excel = TRUE,
   significance_cutoff = 0.05, do_gse = TRUE,
   simplify_ontologies = TRUE, use_background = TRUE,
-  store_r_objects = TRUE, simplify_cutoff = 0.7)
+  store_r_objects = TRUE, simplify_cutoff = 0.7,
+  save_plots_as_pdf = TRUE)
 }
 \arguments{
 \item{dat}{Dataframe containing variables \code{q_value} and \code{EntrezID} or \code{EnsemblID}}
@@ -27,6 +28,8 @@ createHTMLReport(dat, output_path, save_excel = TRUE,
 \item{store_r_objects}{Store clusterProfiler R objects as compressed RDS files to output_path}
 
 \item{simplify_cutoff}{See clusterProfiler::simplify}
+
+\item{save_plots_as_pdf}{Export all plots as PDF to output_path/plots}
 }
 \value{
 cummeRbund cuff object
