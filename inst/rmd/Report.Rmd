@@ -155,6 +155,70 @@ fc_symbol <- dat %>%
   `names<-`(dat$Symbol)
 ```
 
+
+```{r get_go_and_gse}
+
+# Expect a data set containing q_values and Entrez/Ensembl IDs
+dat_goterms <- dat %>% get_go_all_ontologies(
+  significance_cutoff = rmd_params$significance_cutoff,
+  use_background = rmd_params$use_background
+)
+# Get simplified ontologies if required
+if (rmd_params$simplify_ontologies) {
+  dat_goterms_simplified <- simplify_ontologies(
+    ontologies = dat_goterms,
+    cutoff = rmd_params$simplify_cutoff
+  )
+}
+if (rmd_params$do_gse) {
+  dat_gse_go <- dat %>% get_gse_all_ontologies()
+  dat_gse_kegg <- dat %>% get_kegg()
+} else {
+  dat_gse_go <- list()
+  dat_gse_go$Biological_Process <- tibble::tibble()
+  dat_gse_go$Molecular_Function <- tibble::tibble()
+  dat_gse_go$Cellular_Components <- tibble::tibble()
+  dat_gse_kegg <- list()
+  dat_gse_kegg$kegg <- tibble::tibble()
+}
+
+```
+
+```{r export_result}
+# Create dummy variable for for simplified gene ontologies if we did not calculate it
+if (!rmd_params$simplify_ontologies) {
+  dat_goterms_simplified <- data.frame()
+}
+
+# Store clusterProfiler objects to disk
+if (rmd_params$store_r_objects) {
+  dat_goterms %>%
+    saveRDS(file = file.path(rmd_params$output_path, "dat_goterms.rds"))
+  
+  if (rmd_params$do_gse) {
+    dat_gse_go %>%
+      saveRDS(file = file.path(rmd_params$output_path, "dat_gse_go.rds"))
+    dat_gse_kegg %>%
+      saveRDS(file = file.path(rmd_params$output_path, "dat_gse_kegg.rds"))
+  }
+  if (rmd_params$simplify_ontologies) {
+    dat_goterms_simplified %>%
+      saveRDS(file = file.path(rmd_params$output_path, "dat_goterms_simplified.rds"))
+  }
+}
+
+# Export result
+if (rmd_params$save_excel) {
+  export_go_terms_to_excel(
+    go_ontologies        = dat_goterms,
+    go_ontologies_simple = dat_goterms_simplified,
+    gse_ontologies       = dat_gse_go,
+    kegg_ontologies      = dat_gse_kegg,
+    path                 = paste0(rmd_params$output_path, '/go_terms.xlsx')
+  )
+}
+```
+
 ### Volcano Plot
 
 Dataset summary
@@ -210,34 +274,6 @@ For details on the hypergeometric distribution, refer to [GO::TermFinder—open 
 
   - Hypergeometric distribution is a distribution modelling normally distributed probabilities (e.g. red, blue and green marbles in a Urn) -- [Wiki](https://de.wikipedia.org/wiki/Hypergeometrische_Verteilung)
   - Freely spoken, DOSE determines whether any terms annotated by the list of differentially expressed genes is greater than the one expected by chance in a term
-
-
-```{r get_go_and_gse}
-
-# Expect a data set containing q_values and Entrez/Ensembl IDs
-dat_goterms <- dat %>% get_go_all_ontologies(
-  significance_cutoff = rmd_params$significance_cutoff,
-  use_background = rmd_params$use_background
-)
-# Get simplified ontologies if required
-if (rmd_params$simplify_ontologies) {
-  dat_goterms_simplified <- simplify_ontologies(
-    ontologies = dat_goterms,
-    cutoff = rmd_params$simplify_cutoff
-  )
-}
-if (rmd_params$do_gse) {
-  dat_gse_go <- dat %>% get_gse_all_ontologies()
-  dat_gse_kegg <- dat %>% get_kegg()
-} else {
-  dat_gse_go <- list()
-  dat_gse_go$Biological_Process <- tibble::tibble()
-  dat_gse_go$Molecular_Function <- tibble::tibble()
-  dat_gse_go$Cellular_Components <- tibble::tibble()
-  dat_gse_kegg <- list()
-  dat_gse_kegg$kegg <- tibble::tibble()
-}
-```
 
 #### Biological Process
 
@@ -465,40 +501,5 @@ if (rmd_params$do_gse) {
   dat_gse_kegg %>% plot_all_ontologies(fc_symbol)
 } else {
   print("GSE analysis disabled")
-}
-```
-
-```{r export_result}
-# Create dummy variable for for simplified gene ontologies if we did not calculate it
-if (!rmd_params$simplify_ontologies) {
-  dat_goterms_simplified <- data.frame()
-}
-
-# Store clusterProfiler objects to disk
-if (rmd_params$store_r_objects) {
-  dat_goterms %>%
-    saveRDS(file = file.path(rmd_params$output_path, "dat_goterms.rds"))
-  
-  if (rmd_params$do_gse) {
-    dat_gse_go %>%
-      saveRDS(file = file.path(rmd_params$output_path, "dat_gse_go.rds"))
-    dat_gse_kegg %>%
-      saveRDS(file = file.path(rmd_params$output_path, "dat_gse_kegg.rds"))
-  }
-  if (rmd_params$simplify_ontologies) {
-    dat_goterms_simplified %>%
-      saveRDS(file = file.path(rmd_params$output_path, "dat_goterms_simplified.rds"))
-  }
-}
-
-# Export result
-if (rmd_params$save_excel) {
-  export_go_terms_to_excel(
-    go_ontologies        = dat_goterms,
-    go_ontologies_simple = dat_goterms_simplified,
-    gse_ontologies       = dat_gse_go,
-    kegg_ontologies      = dat_gse_kegg,
-    path                 = paste0(rmd_params$output_path, '/go_terms.xlsx')
-  )
 }
 ```
