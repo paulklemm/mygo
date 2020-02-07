@@ -292,11 +292,9 @@ plot_all_ontologies <- function(ontologies, fc_symbol) {
 #' Add count for each GO-term and calculate overlap ratio of significant genes
 #' @export
 #' @import dplyr magrittr tibble
-#' @param dat clusterProfiler GO-term result
-#' @param species Either "MUS" or "HUM"
+#' @param dat clusterProfiler GO-term result DOSE
 attach_goterm_genecount <- function(
   dat,
-  species = "MUS"
 ) {
   dat_tibble <- dat %>%
     tibble::as_tibble()
@@ -304,9 +302,19 @@ attach_goterm_genecount <- function(
   if (dat_tibble %>% nrow() > 0) {
     dat_tibble %>%
       dplyr::rowwise() %>%
+      tidyr::separate(GeneRatio, remove = FALSE, into = c("temp", "TotalCount")) %>%
+      # Remove temporary variable
+      dplyr::select(-temp) %>%
+      tidyr::separate(BgRatio, remove = FALSE, into = c("GOTermGeneCount", "BackgroundCount")) %>%
+      # Convert variables to numeric
+      dplyr::mutate_at(c("TotalCount", "GOTermGeneCount", "BackgroundCount"), as.numeric) %>%
       dplyr::mutate(
-        GOTermGeneCount = rmyknife::get_genes_of_goterm_godb(ID, species = species, verbose = FALSE) %>% length(),
-        Percent_Significant = (Count * 100) / GOTermGeneCount
+        # Do not calculate GO-term size from all genes, but rather from the background
+        # GOTermGeneCount = rmyknife::get_genes_of_goterm_godb(ID, species = species, verbose = FALSE) %>% length(),
+        # This is also called a rich_factor
+        Percent_Significant = (Count * 100) / GOTermGeneCount,
+        # See https://yulab-smu.github.io/clusterProfiler-book/chapter13.html
+        FoldEnrichment = (Count / TotalCount) / (GOTermGeneCount / BackgroundCount)
       ) %>%
       return()
   } else {
@@ -455,7 +463,7 @@ overlap_scatterplot <- function(
       color = "black",
       min.segment.length = 0
     ) +
-    ggthemes::theme_tufte(base_family = "Sans") +
+    ggplot2::theme_minimal() +
     ggplot2::xlab("Total GO-term gene count") + 
     ggplot2::ylab("Percentage of significant genes")
   return(plot)

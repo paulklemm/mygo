@@ -183,7 +183,7 @@ dat %>%
     ggplot2::xlab(expression(log[2](fc))) + 
     ggplot2::ylab(expression(-log[10](adjusted~p~value))) +
     ggplot2::labs(colour = "Significance") +
-    ggthemes::theme_tufte(base_family = "sans") +
+    ggplot2::theme_minimal() +
     ggrepel::geom_text_repel(
       data = . %>%
         dplyr::arrange(q_value) %>%
@@ -284,7 +284,7 @@ The top 15 regulated GO-terms are labeled.
 ```{r bp_overlap_scatterplot, fig.width = 14, fig.height = 10}
 
 dat_goterms$Biological_Process %>%
-  mygo::attach_goterm_genecount(species = "MUS") %>%
+  mygo::attach_goterm_genecount() %>%
   mygo::overlap_scatterplot()
 
 ```
