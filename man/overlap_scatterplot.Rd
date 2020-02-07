@@ -16,6 +16,6 @@ Plot total gene count against percentage of significant genes
 }
 \examples{
   dat_goterms$Biological_Process \%>\%
-    mygo::attach_goterm_genecount(species = "MUS") \%>\%
-    overlap_scatterplot
+    mygo::attach_goterm_genecount() \%>\%
+    mygo::overlap_scatterplot
 }

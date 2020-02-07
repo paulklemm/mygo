@@ -294,7 +294,7 @@ plot_all_ontologies <- function(ontologies, fc_symbol) {
 #' @import dplyr magrittr tibble
 #' @param dat clusterProfiler GO-term result DOSE
 attach_goterm_genecount <- function(
-  dat,
+  dat
 ) {
   dat_tibble <- dat %>%
     tibble::as_tibble()
@@ -441,8 +441,8 @@ perform_gseKEGG <- function(fc) {
 #' @param n Number of GO-terms to label
 #' @examples
 #'   dat_goterms$Biological_Process %>%
-#'     mygo::attach_goterm_genecount(species = "MUS") %>%
-#'     overlap_scatterplot
+#'     mygo::attach_goterm_genecount() %>%
+#'     mygo::overlap_scatterplot
 overlap_scatterplot <- function(
   dat,
   n = 15
@@ -466,5 +466,37 @@ overlap_scatterplot <- function(
     ggplot2::theme_minimal() +
     ggplot2::xlab("Total GO-term gene count") + 
     ggplot2::ylab("Percentage of significant genes")
+  return(plot)
+}
+
+#' Plot top n GO-terms w.r.t percentage of significant genes
+#' Plot adapted from https://yulab-smu.github.io/clusterProfiler-book/chapter13.html
+#' @param dat clusterProfiler GO-term table with attached GOTermGeneCount and Percent_Significant column
+#' @param n Number of GO-terms to label
+#' @export
+#' @import ggplot2 forcats magrittr
+#' @examples
+#'   dat_goterms$Biological_Process %>%
+#'     mygo::attach_goterm_genecount() %>%
+#'     mygo::overlap_percentage_plot()
+overlap_percentage_plot <- function(dat, n = 20) {
+  plot <- dat %>%
+    dplyr::arrange(dplyr::desc(Percent_Significant)) %>%
+    dplyr::rename(`Significant Gene Count` = Count) %>%
+    head(n) %>%
+    ggplot2::ggplot(
+      mapping = ggplot2::aes(
+        Percent_Significant,
+        forcats::fct_reorder(Description, Percent_Significant)
+      )
+    ) +
+      ggplot2::geom_segment(ggplot2::aes(xend = 0, yend = Description)) +
+      ggplot2::geom_point(ggplot2::aes(color = p.adjust, size = `Significant Gene Count`)) +
+      # ggplot2::scale_color_viridis_c(guide = ggplot2::guide_colorbar(reverse = TRUE)) +
+      ggplot2::scale_color_continuous(high = "#132B43", low = "#56B1F7") +
+      ggplot2::scale_size_continuous(range = c(2, 10)) +
+      ggplot2::theme_minimal() +
+      ggplot2::xlab("Percentage of Significant Genes") +
+      ggplot2::ylab(NULL)
   return(plot)
 }

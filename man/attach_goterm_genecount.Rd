@@ -4,12 +4,10 @@
 \alias{attach_goterm_genecount}
 \title{Add count for each GO-term and calculate overlap ratio of significant genes}
 \usage{
-attach_goterm_genecount(dat, species = "MUS")
+attach_goterm_genecount(dat)
 }
 \arguments{
-\item{dat}{clusterProfiler GO-term result}
-
-\item{species}{Either "MUS" or "HUM"}
+\item{dat}{clusterProfiler GO-term result DOSE}
 }
 \description{
 Add count for each GO-term and calculate overlap ratio of significant genes
