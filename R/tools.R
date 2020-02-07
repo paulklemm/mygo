@@ -457,13 +457,13 @@ overlap_scatterplot <- function(
       mapping = ggplot2::aes(
         x = GOTermGeneCount,
         y = Percent_Significant,
-        color = qvalue
+        color = p.adjust
       )
     ) +
     ggplot2::geom_point(alpha = 0.6) +
     ggplot2::scale_color_continuous(high = "#132B43", low = "#56B1F7") +
     ggrepel::geom_label_repel(
-      data = . %>% dplyr::arrange(qvalue) %>% head(n),
+      data = . %>% dplyr::arrange(p.adjust) %>% head(n),
       mapping = ggplot2::aes(label = Description),
       color = "black",
       min.segment.length = 0
