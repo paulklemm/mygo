@@ -312,9 +312,9 @@ attach_goterm_genecount <- function(
         # Do not calculate GO-term size from all genes, but rather from the background
         # GOTermGeneCount = rmyknife::get_genes_of_goterm_godb(ID, species = species, verbose = FALSE) %>% length(),
         # This is also called a rich_factor
-        Percent_Significant = (Count * 100) / GOTermGeneCount,
+        Percent_Significant = (Count * 100) / GOTermGeneCount
         # See https://yulab-smu.github.io/clusterProfiler-book/chapter13.html
-        FoldEnrichment = (Count / TotalCount) / (GOTermGeneCount / BackgroundCount)
+        # FoldEnrichment = (Count / TotalCount) / (GOTermGeneCount / BackgroundCount)
       ) %>%
       return()
   } else {
