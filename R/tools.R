@@ -318,6 +318,7 @@ attach_goterm_genecount <- function(
       ) %>%
       return()
   } else {
+    warning("Cannot attach metrics to empty data frame")
     return(dat_tibble)
   }
 }
@@ -447,6 +448,10 @@ overlap_scatterplot <- function(
   dat,
   n = 15
 ) {
+  if (dat %>% nrow() == 0) {
+    warning("Cannot create overlap scatterplot for empty data frame")
+    return()
+  }
   plot <- dat %>%
     ggplot2::ggplot(
       mapping = ggplot2::aes(
@@ -480,6 +485,10 @@ overlap_scatterplot <- function(
 #'     mygo::attach_goterm_genecount() %>%
 #'     mygo::overlap_percentage_plot()
 overlap_percentage_plot <- function(dat, n = 20) {
+  if (dat %>% nrow() == 0) {
+    warning("Cannot create overlap percentage plot for empty data frame")
+    return()
+  }
   plot <- dat %>%
     dplyr::arrange(dplyr::desc(Percent_Significant)) %>%
     dplyr::rename(`Significant Gene Count` = Count) %>%
