@@ -320,7 +320,7 @@ dat_goterms$Biological_Process %>%
 The Percentage Overlap Plot plots the top n GO-terms w.r.t. overall overlap percentage in the GO-term.
 The adjusted p-value is mapped to color and the number of significant genes to circle size.
 
-```{r bp_overlap_percentage_plot, fig.width = 12, fig.height = 5}
+```{r bp_overlap_percentage_plot, fig.width = 9, fig.height = 4}
 
 dat_goterms$Biological_Process %>%
   mygo::attach_goterm_genecount() %>%
@@ -356,7 +356,7 @@ dat_goterms$Biological_Process %>%
 dat_goterms$Molecular_Function %>%
   print_goterm_as_datatable()
 ```
-```{r mf_overlap_percentage_plot, fig.width = 12, fig.height = 5}
+```{r mf_overlap_percentage_plot, fig.width = 9, fig.height = 4}
 dat_goterms$Molecular_Function %>%
   mygo::attach_goterm_genecount() %>%
   mygo::overlap_percentage_plot()
@@ -377,7 +377,7 @@ dat_goterms$Molecular_Function %>%
 dat_goterms$Cellular_Components %>%
   print_goterm_as_datatable()
 ```
-```{r cc_overlap_percentage_plot, fig.width = 12, fig.height = 5}
+```{r cc_overlap_percentage_plot, fig.width = 9, fig.height = 4}
 dat_goterms$Cellular_Components %>%
   mygo::attach_goterm_genecount() %>%
   mygo::overlap_percentage_plot()
@@ -412,7 +412,7 @@ if (rmd_params$simplify_ontologies) {
     print_goterm_as_datatable()
 }
 ```
-```{r bp_simple_overlap_percentage_plot, fig.width = 12, fig.height = 5}
+```{r bp_simple_overlap_percentage_plot, fig.width = 9, fig.height = 4}
 if (rmd_params$simplify_ontologies) {
   dat_goterms_simplified$Biological_Process %>%
     mygo::attach_goterm_genecount() %>%
@@ -441,7 +441,7 @@ if (rmd_params$simplify_ontologies) {
     print_goterm_as_datatable()
 }
 ```
-```{r mf_simple_overlap_percentage_plot, fig.width = 12, fig.height = 5}
+```{r mf_simple_overlap_percentage_plot, fig.width = 9, fig.height = 4}
 if (rmd_params$simplify_ontologies) {
   dat_goterms_simplified$Molecular_Function %>%
     mygo::attach_goterm_genecount() %>%
@@ -470,7 +470,7 @@ if (rmd_params$simplify_ontologies) {
     print_goterm_as_datatable()
 }
 ```
-```{r cc_simple_overlap_percentage_plot, fig.width = 12, fig.height = 5}
+```{r cc_simple_overlap_percentage_plot, fig.width = 9, fig.height = 4}
 if (rmd_params$simplify_ontologies) {
   dat_goterms_simplified$Cellular_Components %>%
     mygo::attach_goterm_genecount() %>%

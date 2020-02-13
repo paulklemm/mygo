@@ -506,7 +506,7 @@ overlap_percentage_plot <- function(dat, n = 25) {
       ggplot2::geom_point(ggplot2::aes(color = p.adjust, size = `Significant Gene Count`)) +
       # ggplot2::scale_color_viridis_c(guide = ggplot2::guide_colorbar(reverse = TRUE)) +
       ggplot2::scale_color_continuous(high = "#132B43", low = "#56B1F7") +
-      ggplot2::scale_size_continuous(range = c(2, 10)) +
+      ggplot2::scale_size_continuous(range = c(1, 5)) +
       ggplot2::theme_minimal() +
       ggplot2::xlab("Percentage of Significant Genes") +
       ggplot2::ylab(NULL)
