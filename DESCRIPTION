@@ -26,6 +26,6 @@ Imports:
     tibble,
     rmarkdown,
     enrichplot,
-    radix,
     plotly,
-    flexdashboard
+    flexdashboard,
+    ggthemes

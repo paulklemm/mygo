@@ -162,6 +162,9 @@ devtools::install_github("paulklemm/mygo")
 - [clusterProfiler](https://guangchuangyu.github.io/software/clusterProfiler/) by Guangchuang Yu
 
 ## History
+
+- *2020-02-18*
+  - Remove `radix`, add `ggthemes` to `DESCRIPTION`
 - *2020-02-07*
   - Added `save_plots_as_pdf` option
 - *2020-02-05-06*
