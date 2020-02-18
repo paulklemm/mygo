@@ -28,4 +28,6 @@ Imports:
     enrichplot,
     plotly,
     flexdashboard,
-    ggthemes
+    ggthemes,
+    knitr,
+    rmyknife
