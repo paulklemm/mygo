@@ -30,4 +30,5 @@ Imports:
     flexdashboard,
     ggthemes,
     knitr,
-    rmyknife
+    rmyknife,
+    forcats
