@@ -9,4 +9,7 @@ result/
 Report_files/
 figure/
 dat_goterms.rds
+dat_goterms_simplified.rds
+dat_gse_go.rds
+dat_gse_kegg.rds
 plots/

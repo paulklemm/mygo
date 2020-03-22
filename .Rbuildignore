@@ -8,3 +8,7 @@
 ^test$
 ^inst/rmd/Report\.nb\.html$
 ^\.vscode$
+^inst/rmd/dat_goterms\.rds$
+^inst/rmd/dat_goterms_simplified\.rds$
+^inst/rmd/dat_gse_go\.rds$
+^inst/rmd/dat_gse_kegg\.rds$
