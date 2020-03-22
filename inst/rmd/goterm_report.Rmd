@@ -94,6 +94,7 @@ rmd_params$dat %>%
   head() %>%
   knitr::kable()
 
+# Check for mandatory columns
 if (!('q_value' %in% colnames(rmd_params$dat))) {
   stop('Column `q_value` not found in data frame')
 } else if (!('fc' %in% colnames(rmd_params$dat))) {
