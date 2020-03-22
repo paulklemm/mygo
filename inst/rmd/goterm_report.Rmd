@@ -100,6 +100,12 @@ if (!('q_value' %in% colnames(rmd_params$dat))) {
   stop('Column `fc` not found in data frame')
 }
 
+# Check if there are significant genes
+if(rmd_params$dat %>% dplyr::filter(q_value <= rmd_params$significance_cutoff) %>% nrow() == 0) {
+  paste0("No significant entries found with cutoff ", rmd_params$significance_cutoff) %>%
+    stop()
+}
+
 if (rmd_params$save_plots_as_pdf) {
   # Create path for plots
   file.path(rmd_params$output_path, "plots") %>%
