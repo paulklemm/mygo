@@ -91,7 +91,7 @@ createHTMLReport <- function(
     ),
     # RMarkdown options
     output_dir = output_path,
-    output_file = "goterm_report",
+    output_file = "goterm_report.html",
     output_options = list(
       self_contained = TRUE
     ),
