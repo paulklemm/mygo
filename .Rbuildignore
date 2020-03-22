@@ -4,3 +4,7 @@
 ^inst/rmd/go_terms\.xlsx$
 ^result$
 ^result_old$
+^go_terms\.xlsx$
+^test$
+^inst/rmd/Report\.nb\.html$
+^\.vscode$
