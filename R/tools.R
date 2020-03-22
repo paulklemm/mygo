@@ -351,10 +351,11 @@ export_go_terms_to_excel <- function(
   BP_go_simple <- go_ontologies_simple$Biological_Process %>% attach_goterm_genecount()
   MF_go_simple <- go_ontologies_simple$Molecular_Function %>% attach_goterm_genecount()
   CC_go_simple <- go_ontologies_simple$Cellular_Components %>% attach_goterm_genecount()
-  BP_gse <- gse_ontologies$Biological_Process %>% attach_goterm_genecount()
-  MF_gse <- gse_ontologies$Molecular_Function %>% attach_goterm_genecount()
-  CC_gse <- gse_ontologies$Cellular_Components %>% attach_goterm_genecount()
-  kegg_gse <- kegg_ontologies$kegg %>% attach_goterm_genecount()
+  # GSE objects have no GeneRatio object, so we cannot add the goterm genecount
+  BP_gse <- gse_ontologies$Biological_Process %>% tibble::as_tibble()
+  MF_gse <- gse_ontologies$Molecular_Function %>% tibble::as_tibble()
+  CC_gse <- gse_ontologies$Cellular_Components %>% tibble::as_tibble()
+  kegg_gse <- kegg_ontologies$kegg %>% tibble::as_tibble()
 
   c('BP_go', 'MF_go', 'CC_go', 'BP_go_simple', 'MF_go_simple', 'CC_go_simple', 'BP_gse', 'MF_gse', 'CC_gse', 'kegg_gse') %>%
     WriteXLS::WriteXLS(ExcelFileName = path,
