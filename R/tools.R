@@ -73,7 +73,7 @@ createHTMLReport <- function(
   save_plots_as_pdf = TRUE
   ) {
   # https://stackoverflow.com/questions/30377213/how-to-include-rmarkdown-file-in-r-package
-  path_to_report <- system.file("rmd/Report.Rmd", package = "mygo")
+  path_to_report <- system.file("rmd/goterm_report.Rmd", package = "mygo")
   # Render the document and put it into the output dir
   render(
     path_to_report,
