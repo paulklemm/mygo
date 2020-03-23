@@ -313,6 +313,11 @@ Here is the list of all regulated GO-terms sorted by significance.
 #' @import DT dplyr tibble magrittr
 #' @param dat clusterProfiler GO-term result
 print_goterm_as_datatable <- function(dat) {
+  # Check if dat is null
+  if (is.null(dat)) {
+    warning("Table is empty")
+    return()
+  }
   dat %>%
     tibble::as_tibble() %>%
     mygo::attach_goterm_genecount() %>%
