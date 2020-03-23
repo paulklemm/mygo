@@ -109,6 +109,11 @@ createHTMLReport <- function(
 #' @param title ggtitle of the plot
 #' @param n Number of GO-term to plot
 emap_plot <- function(go_terms, title, n = 30) {
+  # Catch null emap plot
+  if (is.null(go_terms)) {
+    warning("Cannot print emap plot, no GO-terms")
+    return()
+  }
   # There is a bug with very small GO term selections that we have to catch
   # HACK
   if (go_terms %>% nrow() > 5) {
