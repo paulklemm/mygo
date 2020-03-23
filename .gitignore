@@ -6,7 +6,8 @@ result/
 .vscode/
 *.xlsx
 *.html
-Report_files/
+goterm_report_files
+result_old
 figure/
 dat_goterms.rds
 dat_goterms_simplified.rds
