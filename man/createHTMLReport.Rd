@@ -4,11 +4,18 @@
 \alias{createHTMLReport}
 \title{Make GO-Term analysis and print out Report}
 \usage{
-createHTMLReport(dat, output_path, save_excel = TRUE,
-  significance_cutoff = 0.05, do_gse = TRUE,
-  simplify_ontologies = TRUE, use_background = TRUE,
-  store_r_objects = TRUE, simplify_cutoff = 0.7,
-  save_plots_as_pdf = TRUE)
+createHTMLReport(
+  dat,
+  output_path,
+  save_excel = TRUE,
+  significance_cutoff = 0.05,
+  do_gse = TRUE,
+  simplify_ontologies = TRUE,
+  use_background = TRUE,
+  store_r_objects = TRUE,
+  simplify_cutoff = 0.7,
+  save_plots_as_pdf = TRUE
+)
 }
 \arguments{
 \item{dat}{Dataframe containing variables \code{q_value} and \code{EntrezID} or \code{EnsemblID}}

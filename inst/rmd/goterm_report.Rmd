@@ -336,14 +336,22 @@ dat_goterms$Biological_Process %>%
   print_goterm_as_datatable()
 ```
 
-The Percentage Overlap Plot plots the top n GO-terms w.r.t. overall overlap percentage in the GO-term.
-The adjusted p-value is mapped to color and the number of significant genes to circle size.
+The Percentage Overlap Plot plots the top 25 GO-terms ordered by
+
+1. significance and 
+2. overlap percentage in each GO-term
+
+The *adjusted p-value is mapped to color* and the *number of significant genes to circle size*.
 
 ```{r bp_overlap_percentage_plot, fig.width = 9, fig.height = 4}
 
 dat_goterms$Biological_Process %>%
   mygo::attach_goterm_genecount() %>%
-  mygo::overlap_percentage_plot()
+  mygo::overlap_percentage_plot(order_by = "significance")
+
+dat_goterms$Biological_Process %>%
+  mygo::attach_goterm_genecount() %>%
+  mygo::overlap_percentage_plot(order_by = "percentage")
 
 ```
 
@@ -377,7 +385,10 @@ dat_goterms$Molecular_Function %>%
 ```{r mf_overlap_percentage_plot, fig.width = 9, fig.height = 4}
 dat_goterms$Molecular_Function %>%
   mygo::attach_goterm_genecount() %>%
-  mygo::overlap_percentage_plot()
+  mygo::overlap_percentage_plot(order_by = "significance")
+dat_goterms$Molecular_Function %>%
+  mygo::attach_goterm_genecount() %>%
+  mygo::overlap_percentage_plot(order_by = "percentage")
 ```
 ```{r mf_emap, fig.width = 14, fig.height = 14}
 dat_goterms$Molecular_Function %>%
@@ -398,7 +409,10 @@ dat_goterms$Cellular_Components %>%
 ```{r cc_overlap_percentage_plot, fig.width = 9, fig.height = 4}
 dat_goterms$Cellular_Components %>%
   mygo::attach_goterm_genecount() %>%
-  mygo::overlap_percentage_plot()
+  mygo::overlap_percentage_plot(order_by = "significance")
+dat_goterms$Cellular_Components %>%
+  mygo::attach_goterm_genecount() %>%
+  mygo::overlap_percentage_plot(order_by = "percentage")
 ```
 ```{r cc_emap, fig.width = 14, fig.height = 14}
 dat_goterms$Cellular_Components %>%
@@ -434,7 +448,10 @@ if (rmd_params$simplify_ontologies) {
 if (rmd_params$simplify_ontologies) {
   dat_goterms_simplified$Biological_Process %>%
     mygo::attach_goterm_genecount() %>%
-    mygo::overlap_percentage_plot()
+    mygo::overlap_percentage_plot(order_by = "significance")
+  dat_goterms_simplified$Biological_Process %>%
+    mygo::attach_goterm_genecount() %>%
+    mygo::overlap_percentage_plot(order_by = "percentage")
 }
 ```
 ```{r bp_simple_emap, fig.width = 14, fig.height = 14}
@@ -463,7 +480,10 @@ if (rmd_params$simplify_ontologies) {
 if (rmd_params$simplify_ontologies) {
   dat_goterms_simplified$Molecular_Function %>%
     mygo::attach_goterm_genecount() %>%
-    mygo::overlap_percentage_plot()
+    mygo::overlap_percentage_plot(order_by = "significance")
+  dat_goterms_simplified$Molecular_Function %>%
+    mygo::attach_goterm_genecount() %>%
+    mygo::overlap_percentage_plot(order_by = "percentage")
 }
 ```
 ```{r mf_simple_emap, fig.width = 14, fig.height = 14}
@@ -492,7 +512,10 @@ if (rmd_params$simplify_ontologies) {
 if (rmd_params$simplify_ontologies) {
   dat_goterms_simplified$Cellular_Components %>%
     mygo::attach_goterm_genecount() %>%
-    mygo::overlap_percentage_plot()
+    mygo::overlap_percentage_plot(order_by = "significance")
+  dat_goterms_simplified$Cellular_Components %>%
+    mygo::attach_goterm_genecount() %>%
+    mygo::overlap_percentage_plot(order_by = "percentage")
 }
 ```
 ```{r cc_simple_emap, fig.width = 14, fig.height = 14}

@@ -4,8 +4,7 @@
 \alias{get_go_all_ontologies}
 \title{Get GO-terms for all ontologies}
 \usage{
-get_go_all_ontologies(dat, significance_cutoff = 0.05,
-  use_background = TRUE)
+get_go_all_ontologies(dat, significance_cutoff = 0.05, use_background = TRUE)
 }
 \arguments{
 \item{dat}{Data frame containing columns \code{pValue} and \code{EntrezID}}

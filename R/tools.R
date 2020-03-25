@@ -488,19 +488,31 @@ overlap_scatterplot <- function(
 #' Plot adapted from https://yulab-smu.github.io/clusterProfiler-book/chapter13.html
 #' @param dat clusterProfiler GO-term table with attached GOTermGeneCount and Percent_Significant column
 #' @param n Number of GO-terms to label
+#' @order_by Order by overlap "percentage" or "significance"
 #' @export
 #' @import ggplot2 forcats magrittr
 #' @examples
 #'   dat_goterms$Biological_Process %>%
 #'     mygo::attach_goterm_genecount() %>%
 #'     mygo::overlap_percentage_plot()
-overlap_percentage_plot <- function(dat, n = 25) {
+overlap_percentage_plot <- function(dat, n = 25, order_by = "percentage") {
   if (dat %>% nrow() == 0) {
     warning("Cannot create overlap percentage plot for empty data frame")
     return()
   }
+  # Order dat in the required way
+  plot_title <- ""
+  if (order_by == "percentage") {
+    dat %<>% dplyr::arrange(dplyr::desc(Percent_Significant))
+    plot_title <- "Ordered by Overlap Percentage"
+  } else if (order_by == "significance") {
+    dat %<>% dplyr::arrange(dplyr::desc(p.adjust))
+    plot_title <- "Ordered by Significance"
+  } else {
+    warning(paste0("I don't know what to do with order_by parameter value ", order_by))
+    return()
+  }
   plot <- dat %>%
-    dplyr::arrange(dplyr::desc(Percent_Significant)) %>%
     dplyr::rename(`Significant Gene Count` = Count) %>%
     head(n) %>%
     ggplot2::ggplot(
@@ -516,6 +528,7 @@ overlap_percentage_plot <- function(dat, n = 25) {
       ggplot2::scale_size_continuous(range = c(1, 5)) +
       ggplot2::theme_minimal() +
       ggplot2::xlab("Percentage of Significant Genes") +
-      ggplot2::ylab(NULL)
+      ggplot2::ylab(NULL) +
+      ggplot2::ggtitle(plot_title)
   return(plot)
 }

@@ -4,8 +4,14 @@
 \alias{export_go_terms_to_excel}
 \title{Export list of GO terms to Excel file}
 \usage{
-export_go_terms_to_excel(go_ontologies, go_ontologies_simple,
-  gse_ontologies, kegg_ontologies, path, species = "MUS")
+export_go_terms_to_excel(
+  go_ontologies,
+  go_ontologies_simple,
+  gse_ontologies,
+  kegg_ontologies,
+  path,
+  species = "MUS"
+)
 }
 \arguments{
 \item{go_ontologies}{List of clusterProfiler enrichResult objects with elements BP, MF and CC}

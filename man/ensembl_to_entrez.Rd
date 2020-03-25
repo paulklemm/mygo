@@ -4,8 +4,12 @@
 \alias{ensembl_to_entrez}
 \title{Gets Entrez IDs and add it to dat}
 \usage{
-ensembl_to_entrez(dat, ensembl_id_name,
-  keep_only_rows_with_entrez = TRUE, drop_duplicates = TRUE)
+ensembl_to_entrez(
+  dat,
+  ensembl_id_name,
+  keep_only_rows_with_entrez = TRUE,
+  drop_duplicates = TRUE
+)
 }
 \arguments{
 \item{dat}{Data frame with ensembl identifier}
