@@ -163,6 +163,8 @@ devtools::install_github("paulklemm/mygo")
 
 ## History
 
+- *2020-03-25*
+  - Remove the overlap percentage in favor or plotting the top-regulated terms
 - *2020-02-18*
   - Remove `radix`, add `ggthemes` to `DESCRIPTION`
 - *2020-02-07*

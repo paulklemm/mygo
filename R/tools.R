@@ -504,10 +504,10 @@ overlap_percentage_plot <- function(dat, n = 25, order_by = "percentage") {
   plot_title <- ""
   if (order_by == "percentage") {
     dat %<>% dplyr::arrange(dplyr::desc(Percent_Significant))
-    plot_title <- "Ordered by Overlap Percentage"
+    plot_title <- paste0("Top ", n, " terms with highest overlap")
   } else if (order_by == "significance") {
-    dat %<>% dplyr::arrange(dplyr::desc(p.adjust))
-    plot_title <- "Ordered by Significance"
+    dat %<>% dplyr::arrange(p.adjust)
+    plot_title <- paste0("Top ", n, " sig. terms, ordered by overlap")
   } else {
     warning(paste0("I don't know what to do with order_by parameter value ", order_by))
     return()
