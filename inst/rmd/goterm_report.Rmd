@@ -327,7 +327,7 @@ print_goterm_as_datatable <- function(dat) {
     mygo::attach_goterm_genecount() %>%
     dplyr::select(-pvalue, -qvalue) %>%
     # Move geneID to the very last row
-    dplyr::select(dplyr::everything(), geneID)
+    dplyr::select(dplyr::everything(), geneID) %>%
     DT::datatable(
       extensions = "Buttons",
       options = list(
