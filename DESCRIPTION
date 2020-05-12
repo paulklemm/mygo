@@ -1,6 +1,6 @@
 Package: mygo
 Title: Create Report for mus musculus dataset of GO-term analysis using clusterProfiler
-Version: 0.0.7
+Version: 0.0.8
 Authors@R: 
     person(given = "Paul",
         family = "Klemm",

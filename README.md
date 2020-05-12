@@ -163,6 +163,8 @@ devtools::install_github("paulklemm/mygo")
 
 ## History
 
+- *2020-05-12*
+  - Knit the document in a temporary folder to avoid files being cleaned up in the render function
 - *2020-04-22*
   - Have complete tables in the report file so users can download their tables from there
 - *2020-03-25*
