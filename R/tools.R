@@ -74,6 +74,9 @@ createHTMLReport <- function(
   ) {
   # https://stackoverflow.com/questions/30377213/how-to-include-rmarkdown-file-in-r-package
   path_to_report <- system.file("rmd/goterm_report.Rmd", package = "mygo")
+  # Create temporary knitting dir
+  temp_knitting_path <- file.path(output_path, "knitting")
+  dir.create(path = temp_knitting_path, recursive = TRUE)
   # Render the document and put it into the output dir
   render(
     path_to_report,
@@ -95,10 +98,12 @@ createHTMLReport <- function(
     output_options = list(
       self_contained = TRUE
     ),
-    intermediates_dir = output_path,
-    knit_root_dir = output_path,
+    intermediates_dir = temp_knitting_path,
+    knit_root_dir = temp_knitting_path,
     clean = TRUE
   )
+  # Now remove the intermediate knitting directory
+  file.remove(temp_knitting_path)
 }
 
 #' Create clusterProfiler EMA plot from go term
