@@ -17,6 +17,7 @@ params:
   store_r_objects: TRUE
   simplify_cutoff: 0.7
   save_plots_as_pdf: TRUE
+  verbose: TRUE
 ---
 
 **Don't Panic**.
@@ -74,6 +75,15 @@ rmd_params$use_background <- params$use_background
 rmd_params$store_r_objects <- params$store_r_objects
 rmd_params$simplify_cutoff <- params$simplify_cutoff
 rmd_params$save_plots_as_pdf <- params$save_plots_as_pdf
+rmd_params$verbose <- params$verbose
+
+#' Only print text if verbose
+#' @param dat Object to print if verbose is enabled 
+print_verbose <- function(dat) {
+  if (rmd_params$verbose) {
+    print(dat)
+  }
+}
 
 library(magrittr)
 suppressWarnings(library(mygo))
@@ -87,8 +97,8 @@ suppressWarnings(library(rmyknife))
 
 # Print settings as table
 tibble::tibble(
-  name = c("output_path", "save_excel", "significance_cutoff", "simplify_ontologies", "do_gse", "use_background", "store_r_objects", "simplify_cutoff", "save_plots_as_pdf"),
-  setting = c(rmd_params$output_path, rmd_params$save_excel, rmd_params$significance_cutoff, rmd_params$simplify_ontologies, rmd_params$do_gse, rmd_params$use_background, rmd_params$store_r_objects, rmd_params$simplify_cutoff, rmd_params$save_plots_as_pdf)
+  name = c("output_path", "save_excel", "significance_cutoff", "simplify_ontologies", "do_gse", "use_background", "store_r_objects", "simplify_cutoff", "save_plots_as_pdf", "verbose"),
+  setting = c(rmd_params$output_path, rmd_params$save_excel, rmd_params$significance_cutoff, rmd_params$simplify_ontologies, rmd_params$do_gse, rmd_params$use_background, rmd_params$store_r_objects, rmd_params$simplify_cutoff, rmd_params$save_plots_as_pdf, rmd_params$verbose)
 ) %>%
   knitr::kable()
 
@@ -225,6 +235,10 @@ if (!rmd_params$simplify_ontologies) {
 
 # Store clusterProfiler objects to disk
 if (rmd_params$store_r_objects) {
+  # Verbose output
+  paste0("Export R objects to ", file.path(rmd_params$output_path, "dat_goterms.rds")) %>%
+    print_verbose()
+  
   dat_goterms %>%
     saveRDS(file = file.path(rmd_params$output_path, "dat_goterms.rds"))
 
@@ -242,12 +256,14 @@ if (rmd_params$store_r_objects) {
 
 # Export result
 if (rmd_params$save_excel) {
+  export_path <- paste0(rmd_params$output_path, "/go_terms.xlsx")
+  paste0("Export excel sheet to ", export_path) %>% print_verbose()
   export_go_terms_to_excel(
     go_ontologies = dat_goterms,
     go_ontologies_simple = dat_goterms_simplified,
     gse_ontologies = dat_gse_go,
     kegg_ontologies = dat_gse_kegg,
-    path = paste0(rmd_params$output_path, "/go_terms.xlsx")
+    path = export_path
   )
 }
 ```
