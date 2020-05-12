@@ -87,8 +87,28 @@ suppressWarnings(library(rmyknife))
 
 # Print settings as table
 tibble::tibble(
-  name = c("output_path", "save_excel", "significance_cutoff", "simplify_ontologies", "do_gse", "use_background", "store_r_objects", "simplify_cutoff", "save_plots_as_pdf"),
-  setting = c(rmd_params$output_path, rmd_params$save_excel, rmd_params$significance_cutoff, rmd_params$simplify_ontologies, rmd_params$do_gse, rmd_params$use_background, rmd_params$store_r_objects, rmd_params$simplify_cutoff, rmd_params$save_plots_as_pdf)
+  name = c(
+    "output_path",
+    "save_excel",
+    "significance_cutoff",
+    "simplify_ontologies",
+    "do_gse",
+    "use_background",
+    "store_r_objects",
+    "simplify_cutoff",
+    "save_plots_as_pdf"
+  ),
+  setting = c(
+    rmd_params$output_path,
+    rmd_params$save_excel,
+    rmd_params$significance_cutoff,
+    rmd_params$simplify_ontologies,
+    rmd_params$do_gse,
+    rmd_params$use_background,
+    rmd_params$store_r_objects,
+    rmd_params$simplify_cutoff,
+    rmd_params$save_plots_as_pdf
+  )
 ) %>%
   knitr::kable()
 
