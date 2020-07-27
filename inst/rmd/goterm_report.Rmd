@@ -336,7 +336,7 @@ For details on the hypergeometric distribution, refer to [GO::TermFinder—open 
 
 Here is the list of all regulated GO-terms sorted by significance.
 
-```{r bp_print_table}
+```{r define-goterm-table}
 #' Helper function, takes clusterProfiler GO-term result and prints it as DT widget
 #' @export
 #' @import DT dplyr tibble magrittr
@@ -363,9 +363,17 @@ print_goterm_as_datatable <- function(dat) {
     ) %>%
     return()
 }
+```
+
+<details>
+<summary>Data table</summary>
+
+```{bp-print-table}
 dat_goterms$Biological_Process %>%
   print_goterm_as_datatable()
 ```
+
+</details>
 
 The Percentage Overlap Plot plots the top 25 GO-terms ordered by
 
@@ -404,10 +412,16 @@ dat_goterms$Biological_Process %>%
 
 #### Molecular Function
 
+<details>
+<summary>Data table</summary>
+
 ```{r mf_print_table}
 dat_goterms$Molecular_Function %>%
   print_goterm_as_datatable()
 ```
+
+</details>
+
 ```{r mf_overlap_percentage_plot, fig.width = 9, fig.height = 4}
 dat_goterms$Molecular_Function %>%
   mygo::attach_goterm_genecount() %>%
@@ -425,10 +439,16 @@ dat_goterms$Molecular_Function %>%
 
 #### Cellular Components
 
+<details>
+<summary>Data table</summary>
+
 ```{r cc_print_table}
 dat_goterms$Cellular_Components %>%
   print_goterm_as_datatable()
 ```
+
+</details>
+
 ```{r cc_overlap_percentage_plot, fig.width = 9, fig.height = 4}
 dat_goterms$Cellular_Components %>%
   mygo::attach_goterm_genecount() %>%
@@ -458,12 +478,18 @@ if (!rmd_params$simplify_ontologies) {
 
 #### Biological Process
 
+<details>
+<summary>Data table</summary>
+
 ```{r bp_simple_print_table}
 if (rmd_params$simplify_ontologies) {
   dat_goterms_simplified$Biological_Process %>%
     print_goterm_as_datatable()
 }
 ```
+
+</details>
+
 ```{r bp_simple_overlap_percentage_plot, fig.width = 9, fig.height = 4}
 if (rmd_params$simplify_ontologies) {
   dat_goterms_simplified$Biological_Process %>%
@@ -487,12 +513,18 @@ if (rmd_params$simplify_ontologies) {
 
 #### Molecular Function
 
+<details>
+<summary>Data table</summary>
+
 ```{r mf_simple_print_table}
 if (rmd_params$simplify_ontologies) {
   dat_goterms_simplified$Molecular_Function %>%
     print_goterm_as_datatable()
 }
 ```
+
+</details>
+
 ```{r mf_simple_overlap_percentage_plot, fig.width = 9, fig.height = 4}
 if (rmd_params$simplify_ontologies) {
   dat_goterms_simplified$Molecular_Function %>%
@@ -516,12 +548,18 @@ if (rmd_params$simplify_ontologies) {
 
 #### Cellular Components
 
+<details>
+<summary>Data table</summary>
+
 ```{r cc_simple_print_table}
 if (rmd_params$simplify_ontologies) {
   dat_goterms_simplified$Cellular_Components %>%
     print_goterm_as_datatable()
 }
 ```
+
+</details>
+
 ```{r cc_simple_overlap_percentage_plot, fig.width = 9, fig.height = 4}
 if (rmd_params$simplify_ontologies) {
   dat_goterms_simplified$Cellular_Components %>%
