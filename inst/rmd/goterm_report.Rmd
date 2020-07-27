@@ -151,8 +151,12 @@ if (rmd_params$save_plots_as_pdf) {
 if (!("EntrezID" %in% colnames(rmd_params$dat))) {
   warning("EntrezID not available in data frame. Attaching it manually")
   dat <- rmd_params$dat %>%
-    ensembl_to_entrez(ensembl_id_name = "ensembl_gene_id", keep_only_rows_with_entrez = TRUE, drop_duplicates = TRUE) %>%
-    attach_gene_symbol_from_entrez()
+    rmyknife::ensembl_to_entrez(
+      ensembl_id_name = "ensembl_gene_id",
+      keep_only_rows_with_entrez = TRUE,
+      drop_duplicates = TRUE
+    ) %>%
+    rmyknife::attach_gene_symbol_from_entrez()
 
   # Get regulated genes that don't have a EntrezID
   # https://github.sf.mpg.de/bruening-lab/2018-01-Weiyi-Differential-Gene-Expression-Analysis/blob/master/Analysis_DESeq.Rmd
