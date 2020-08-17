@@ -353,14 +353,7 @@ print_goterm_as_datatable <- function(dat) {
     dplyr::select(-pvalue, -qvalue) %>%
     # Move geneID to the very last row
     dplyr::select(dplyr::everything(), geneID) %>%
-    DT::datatable(
-      extensions = "Buttons",
-      options = list(
-        dom = "Bfrtip",
-        buttons = c("copy", "csv", "excel", "pdf", "print")
-      ),
-      filter = "top"
-    ) %>%
+    rmyknife::rmyknife::dt_datatable() %>%
     return()
 }
 ```
