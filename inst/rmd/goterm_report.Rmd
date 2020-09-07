@@ -238,7 +238,6 @@ if (rmd_params$do_gse) {
   dat_gse_kegg <- list()
   dat_gse_kegg$kegg <- tibble::tibble()
 }
-
 ```
 
 ```{r export_result}
@@ -358,15 +357,11 @@ print_goterm_as_datatable <- function(dat) {
 }
 ```
 
-<details>
-<summary>Data table</summary>
 
 ```{bp-print-table}
 dat_goterms$Biological_Process %>%
   print_goterm_as_datatable()
 ```
-
-</details>
 
 The Percentage Overlap Plot plots the top 25 GO-terms ordered by
 
@@ -400,20 +395,15 @@ The top 15 regulated GO-terms are labeled.
 dat_goterms$Biological_Process %>%
   mygo::attach_goterm_genecount() %>%
   mygo::overlap_scatterplot()
-
 ```
 
 #### Molecular Function
 
-<details>
-<summary>Data table</summary>
 
 ```{r mf_print_table}
 dat_goterms$Molecular_Function %>%
   print_goterm_as_datatable()
 ```
-
-</details>
 
 ```{r mf_overlap_percentage_plot, fig.width = 9, fig.height = 4}
 dat_goterms$Molecular_Function %>%
@@ -432,15 +422,11 @@ dat_goterms$Molecular_Function %>%
 
 #### Cellular Components
 
-<details>
-<summary>Data table</summary>
 
 ```{r cc_print_table}
 dat_goterms$Cellular_Components %>%
   print_goterm_as_datatable()
 ```
-
-</details>
 
 ```{r cc_overlap_percentage_plot, fig.width = 9, fig.height = 4}
 dat_goterms$Cellular_Components %>%
@@ -471,8 +457,6 @@ if (!rmd_params$simplify_ontologies) {
 
 #### Biological Process
 
-<details>
-<summary>Data table</summary>
 
 ```{r bp_simple_print_table}
 if (rmd_params$simplify_ontologies) {
@@ -480,8 +464,6 @@ if (rmd_params$simplify_ontologies) {
     print_goterm_as_datatable()
 }
 ```
-
-</details>
 
 ```{r bp_simple_overlap_percentage_plot, fig.width = 9, fig.height = 4}
 if (rmd_params$simplify_ontologies) {
@@ -506,8 +488,6 @@ if (rmd_params$simplify_ontologies) {
 
 #### Molecular Function
 
-<details>
-<summary>Data table</summary>
 
 ```{r mf_simple_print_table}
 if (rmd_params$simplify_ontologies) {
@@ -515,8 +495,6 @@ if (rmd_params$simplify_ontologies) {
     print_goterm_as_datatable()
 }
 ```
-
-</details>
 
 ```{r mf_simple_overlap_percentage_plot, fig.width = 9, fig.height = 4}
 if (rmd_params$simplify_ontologies) {
@@ -541,8 +519,6 @@ if (rmd_params$simplify_ontologies) {
 
 #### Cellular Components
 
-<details>
-<summary>Data table</summary>
 
 ```{r cc_simple_print_table}
 if (rmd_params$simplify_ontologies) {
@@ -550,8 +526,6 @@ if (rmd_params$simplify_ontologies) {
     print_goterm_as_datatable()
 }
 ```
-
-</details>
 
 ```{r cc_simple_overlap_percentage_plot, fig.width = 9, fig.height = 4}
 if (rmd_params$simplify_ontologies) {
