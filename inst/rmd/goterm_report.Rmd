@@ -65,8 +65,8 @@ Here is a description of each column of the GO-term analysis result.
 | `BackGroundCount`    | total number of genes in dataset (extracted from `BGRatio`)                                                                                                    |
 | `p.adjust`           | [clusterProfiler](https://doi.org/10.1089/omi.2011.0118) Benjamini-Hochberg adjusted p-value, adjustment for false discovery rate (FDR)                        |
 | `geneID`             | [clusterProfiler](https://doi.org/10.1089/omi.2011.0118) Significantly regulated genes that are part of this GO-term                                           |
-| `Count`              | [ensembl.org](https://www.ensembl.org/info/genome/stable_ids/index.html) number of significant genes associated with GO-term (extracted from `GeneRatio`).     |
-| `PercentSignificant` | [ensembl.org](https://www.ensembl.org/info/genome/stable_ids/index.html) Percentage of differentially expressed genes of the GO-term                           |
+| `Count`              | number of significant genes associated with GO-term (extracted from `GeneRatio`).     |
+| `PercentSignificant` | Percentage of differentially expressed genes of the GO-term                           |
 
 ## {.tabset}
 
