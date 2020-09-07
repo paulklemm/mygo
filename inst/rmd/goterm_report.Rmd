@@ -375,8 +375,7 @@ print_goterm_as_datatable <- function(dat) {
 }
 ```
 
-
-```{bp-print-table}
+```{r bp-print-table}
 dat_goterms$Biological_Process %>%
   print_goterm_as_datatable()
 ```
