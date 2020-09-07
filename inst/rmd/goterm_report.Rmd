@@ -56,17 +56,17 @@ Here is a description of each column of the GO-term analysis result.
 
 | Column               | Description                                                                                                                                                    |
 |----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `ID`                 | [Gene Ontology](http://geneontology.org/docs/faq/) ID]                                                                                                         |
+| `ID`                 | [Gene Ontology](http://geneontology.org/docs/faq/) ID                                                                                                          |
 | `Description`        | [Gene Ontology](http://geneontology.org/docs/faq/) description                                                                                                 |
-| `GeneRatio`          | [clusterProfiler](https://doi.org/10.1089/omi.2011.0118) (number of significant genes associated with GO-term)/(number of significant genes in whole dataset)] |
-| `TotalCount`         | number of significant genes in whole dataset (extracted from `GeneRatio`)]                                                                                     |
-| `BGRatio`            | [clusterProfiler](https://doi.org/10.1089/omi.2011.0118) background ratio. (number of genes of the GO-term)/(total number of genes in dataset)]                |
-| `GOTermGeneCount`    | number of genes of the GO-term (extracted from `BGRatio`)]                                                                                                     |
-| `BackGroundCount`    | total number of genes in dataset (extracted from `BGRatio`)]                                                                                                   |
-| `p.adjust`           | [clusterProfiler](https://doi.org/10.1089/omi.2011.0118) Benjamini-Hochberg adjusted p-value, adjustment for false discovery rate (FDR)]                       |
-| `geneID`             | [clusterProfiler](https://doi.org/10.1089/omi.2011.0118) Significantly regulated genes that are part of this GO-term]                                          |
-| `Count`              | [ensembl.org](https://www.ensembl.org/info/genome/stable_ids/index.html) number of significant genes associated with GO-term (extracted from `GeneRatio`).]    |
-| `PercentSignificant` | [ensembl.org](https://www.ensembl.org/info/genome/stable_ids/index.html) Percentage of differentially expressed genes of the GO-term]                          |
+| `GeneRatio`          | [clusterProfiler](https://doi.org/10.1089/omi.2011.0118) (number of significant genes associated with GO-term)/(number of significant genes in whole dataset)  |
+| `TotalCount`         | number of significant genes in whole dataset (extracted from `GeneRatio`)                                                                                      |
+| `BGRatio`            | [clusterProfiler](https://doi.org/10.1089/omi.2011.0118) background ratio. (number of genes of the GO-term)/(total number of genes in dataset)                 |
+| `GOTermGeneCount`    | number of genes of the GO-term (extracted from `BGRatio`)                                                                                                      |
+| `BackGroundCount`    | total number of genes in dataset (extracted from `BGRatio`)                                                                                                    |
+| `p.adjust`           | [clusterProfiler](https://doi.org/10.1089/omi.2011.0118) Benjamini-Hochberg adjusted p-value, adjustment for false discovery rate (FDR)                        |
+| `geneID`             | [clusterProfiler](https://doi.org/10.1089/omi.2011.0118) Significantly regulated genes that are part of this GO-term                                           |
+| `Count`              | [ensembl.org](https://www.ensembl.org/info/genome/stable_ids/index.html) number of significant genes associated with GO-term (extracted from `GeneRatio`).     |
+| `PercentSignificant` | [ensembl.org](https://www.ensembl.org/info/genome/stable_ids/index.html) Percentage of differentially expressed genes of the GO-term                           |
 
 ## {.tabset}
 
