@@ -353,28 +353,6 @@ For details on the hypergeometric distribution, refer to [GO::TermFinder—open 
 
 Here is the list of all regulated GO-terms sorted by significance.
 
-```{r define-goterm-table}
-#' Helper function, takes clusterProfiler GO-term result and prints it as DT widget
-#' @export
-#' @import DT dplyr tibble magrittr
-#' @param dat clusterProfiler GO-term result
-print_goterm_as_datatable <- function(dat) {
-  # Check if dat is null
-  if (is.null(dat)) {
-    warning("Table is empty")
-    return()
-  }
-  dat %>%
-    tibble::as_tibble() %>%
-    mygo::attach_goterm_genecount() %>%
-    dplyr::select(-pvalue, -qvalue) %>%
-    # Move geneID to the very last row
-    dplyr::select(dplyr::everything(), geneID) %>%
-    rmyknife::dt_datatable() %>%
-    return()
-}
-```
-
 ```{r bp-print-table}
 dat_goterms$Biological_Process %>%
   print_goterm_as_datatable()

@@ -490,3 +490,23 @@ overlap_percentage_plot <- function(dat, n = 25, order_by = "percentage") {
       ggplot2::ggtitle(plot_title)
   return(plot)
 }
+
+#' Helper function, takes clusterProfiler GO-term result and prints it as DT widget
+#' @export
+#' @import DT dplyr tibble magrittr
+#' @param dat clusterProfiler GO-term result
+print_goterm_as_datatable <- function(dat) {
+  # Check if dat is null
+  if (is.null(dat)) {
+    warning("Table is empty")
+    return()
+  }
+  dat %>%
+    tibble::as_tibble() %>%
+    mygo::attach_goterm_genecount() %>%
+    dplyr::select(-pvalue, -qvalue) %>%
+    # Move geneID to the very last row
+    dplyr::select(dplyr::everything(), geneID) %>%
+    rmyknife::dt_datatable() %>%
+    return()
+}

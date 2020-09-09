@@ -163,6 +163,9 @@ devtools::install_github("paulklemm/mygo")
 
 ## History
 
+- *2020-09-09*
+  - Export `print_goterm_as_datatable` function
+  - Bump version to `0.0.9`
 - *2020-09-07*
   - Add data dictionary
 - *2020-05-12*
