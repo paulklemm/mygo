@@ -510,3 +510,39 @@ print_goterm_as_datatable <- function(dat) {
     rmyknife::dt_datatable() %>%
     return()
 }
+
+#' @param dat dataframe containing columns EntrezID and log2FoldChange
+#' @param pathway kegg pathway name
+#' @param species kegg species ID
+#' @export
+#' @import pathview magrittr dplyr png
+print_kegg <- function(
+  dat,
+  pathway,
+  species = "mmu"
+) {
+  # Create a named vector containing foldchanges and Entrez IDs
+  fc_symbol_entrez <- dat %>%
+    dplyr::filter(!is.na(EntrezID)) %>%
+    .$log2FoldChange %>%
+    as.double() %>%
+    `names<-`(dat %>% .$EntrezID)
+  # https://yulab-smu.top/clusterProfiler-book/chapter12.html
+  kegg_pathway <- pathview::pathview(
+    gene.data  = fc_symbol_entrez,
+    pathway.id = pathway,
+    gene.gene.idtype = "entrez",
+    species = species,
+    low = list("gene" = "blue"),
+    high = list("gene" = "red")
+  )
+  # Filename
+  kegg_png <- png::readPNG(glue::glue("{getwd()}/{pathway}.pathview.png"))
+  plot(as.raster(kegg_png))
+  # Remove intermediate files
+  file.remove(glue::glue("{getwd()}/{pathway}.pathview.png"))
+  file.remove(glue::glue("{getwd()}/{pathway}.png"))
+  file.remove(glue::glue("{pathway}.pathview.png"))
+  file.remove(glue::glue("{pathway}.png"))
+  file.remove(glue::glue("{pathway}.xml"))
+}
