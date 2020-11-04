@@ -516,7 +516,7 @@ print_goterm_as_datatable <- function(dat) {
 #' @param pathway kegg pathway name
 #' @param species kegg species ID
 #' @export
-#' @import pathview magrittr dplyr pngs
+#' @import pathview magrittr dplyr png
 plot_kegg_pathway <- function(
   dat,
   pathway,
