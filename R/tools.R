@@ -538,14 +538,14 @@ plot_kegg_pathway <- function(
     low = list("gene" = "blue"),
     high = list("gene" = "red")
   )
+  # Filename
+  kegg_png <- png::readPNG(glue::glue("{getwd()}/{pathway}.pathview.png"))
   # Remove intermediate files
   file.remove(glue::glue("{getwd()}/{pathway}.pathview.png"))
   file.remove(glue::glue("{getwd()}/{pathway}.png"))
   file.remove(glue::glue("{pathway}.pathview.png"))
   file.remove(glue::glue("{pathway}.png"))
   file.remove(glue::glue("{pathway}.xml"))
-  # Filename
-  kegg_png <- png::readPNG(glue::glue("{getwd()}/{pathway}.pathview.png"))
   return(kegg_png)
 }
 
