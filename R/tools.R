@@ -536,14 +536,18 @@ print_kegg <- function(
     low = list("gene" = "blue"),
     high = list("gene" = "red")
   )
-  # Filename
-  kegg_png <- png::readPNG(glue::glue("{getwd()}/{pathway}.pathview.png"))
-  plot(as.raster(kegg_png))
   # Remove intermediate files
   file.remove(glue::glue("{getwd()}/{pathway}.pathview.png"))
   file.remove(glue::glue("{getwd()}/{pathway}.png"))
   file.remove(glue::glue("{pathway}.pathview.png"))
   file.remove(glue::glue("{pathway}.png"))
   file.remove(glue::glue("{pathway}.xml"))
+  # Filename
+  kegg_png <- png::readPNG(glue::glue("{getwd()}/{pathway}.pathview.png"))
+  # Print the kegg pathway PNG
+  kegg_png %>%
+    as.raster() %>%
+    plot()
+  # Return nothing
   return()
 }
