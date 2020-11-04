@@ -545,4 +545,5 @@ print_kegg <- function(
   file.remove(glue::glue("{pathway}.pathview.png"))
   file.remove(glue::glue("{pathway}.png"))
   file.remove(glue::glue("{pathway}.xml"))
+  return()
 }
