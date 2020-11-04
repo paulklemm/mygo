@@ -516,8 +516,7 @@ print_goterm_as_datatable <- function(dat) {
 #' @param pathway kegg pathway name
 #' @param species kegg species ID
 #' @export
-#' @import pathview magrittr dplyr png
-#' @return png object
+#' @import pathview magrittr dplyr pngs
 plot_kegg_pathway <- function(
   dat,
   pathway,
@@ -546,7 +545,7 @@ plot_kegg_pathway <- function(
   file.remove(glue::glue("{pathway}.pathview.png"))
   file.remove(glue::glue("{pathway}.png"))
   file.remove(glue::glue("{pathway}.xml"))
-  return(kegg_png)
+  plot_png(kegg_png)
 }
 
 #' Plot png object (e.g. from plot_kegg_pathway)

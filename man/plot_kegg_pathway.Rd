@@ -13,9 +13,6 @@ plot_kegg_pathway(dat, pathway, species = "mmu")
 
 \item{species}{kegg species ID}
 }
-\value{
-png object
-}
 \description{
 Create KEGG pathway as PNG
 }
