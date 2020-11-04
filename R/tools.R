@@ -511,12 +511,14 @@ print_goterm_as_datatable <- function(dat) {
     return()
 }
 
+#' Create KEGG pathway as PNG
 #' @param dat dataframe containing columns EntrezID and log2FoldChange
 #' @param pathway kegg pathway name
 #' @param species kegg species ID
 #' @export
 #' @import pathview magrittr dplyr png
-print_kegg <- function(
+#' @return png object
+plot_kegg_pathway <- function(
   dat,
   pathway,
   species = "mmu"
@@ -544,10 +546,15 @@ print_kegg <- function(
   file.remove(glue::glue("{pathway}.xml"))
   # Filename
   kegg_png <- png::readPNG(glue::glue("{getwd()}/{pathway}.pathview.png"))
-  # Print the kegg pathway PNG
-  kegg_png %>%
+  return(kegg_png)
+}
+
+#' Plot png object (e.g. from plot_kegg_pathway)
+#' @param png object
+#' @import png magrittr
+#' @export
+plot_png <- function(png) {
+  png %>%
     as.raster() %>%
     plot()
-  # Return nothing
-  return()
 }
