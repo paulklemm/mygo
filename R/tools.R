@@ -517,7 +517,8 @@ print_goterm_as_datatable <- function(dat) {
 #' @param species kegg species ID
 #' @export
 #' @import pathview magrittr dplyr png
-plot_kegg_pathway <- function(
+#' @return png object
+plot_kegg <- function(
   dat,
   pathway,
   species = "mmu"
@@ -545,7 +546,11 @@ plot_kegg_pathway <- function(
   file.remove(glue::glue("{pathway}.pathview.png"))
   file.remove(glue::glue("{pathway}.png"))
   file.remove(glue::glue("{pathway}.xml"))
-  plot_png(kegg_png)
+  # For some reason elusive to me we cannot print it in here or export it
+  # As an raster image without weird stuff happening. That's why we made
+  # the printing png function separate.
+  kegg_png %>%
+    return()
 }
 
 #' Plot png object (e.g. from plot_kegg_pathway)
