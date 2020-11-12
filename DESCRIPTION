@@ -31,4 +31,5 @@ Imports:
     ggthemes,
     knitr,
     rmyknife,
-    forcats
+    forcats,
+    pathview
