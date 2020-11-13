@@ -399,7 +399,6 @@ perform_gseGO <- function(ontology, fc) {
   clusterProfiler::gseGO(geneList = fc,
     OrgDb = org.Mm.eg.db,
     ont = ontology,
-    nPerm = 1000,
     minGSSize = 100,
     maxGSSize = 500,
     pvalueCutoff = 0.05,
@@ -415,7 +414,7 @@ perform_gseGO <- function(ontology, fc) {
 #' @import magrittr clusterProfiler DOSE
 #' @param fc Named vector of foldchanges (name denotes Entrez ID)
 perform_gseKEGG <- function(fc) {
-  fc %>% clusterProfiler::gseKEGG(nPerm = 10000, organism = 'mmu') %>%
+  fc %>% clusterProfiler::gseKEGG(organism = "mmu") %>%
     return()
 }
 
