@@ -74,7 +74,7 @@ emap_plot <- function(go_terms, title, n = 30) {
   }
   # There is a bug with very small GO term selections that we have to catch
   # HACK
-  if (go_terms %>% nrow() > 5) {
+  if (go_terms %>% nrow() > 10) {
     plot <- go_terms %>%
       enrichplot::emapplot(showCategory = n) +
       ggplot2::ggtitle(title)
