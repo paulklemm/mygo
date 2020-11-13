@@ -72,14 +72,30 @@ emap_plot <- function(go_terms, title, n = 30) {
     warning("Cannot print emap plot, no GO-terms")
     return()
   }
-  # There is a bug with very small GO term selections that we have to catch
-  # HACK
-  if (go_terms %>% nrow() > 10) {
-    plot <- go_terms %>%
-      enrichplot::emapplot(showCategory = n) +
-      ggplot2::ggtitle(title)
-    return(plot)
-  }
+  # # There is a bug with very small GO term selections that we have to catch
+  # # HACK
+  # if (go_terms %>% nrow() > 10) {
+  #   plot <- go_terms %>%
+  #     enrichplot::emapplot(showCategory = n) +
+  #     ggplot2::ggtitle(title)
+  #   return(plot)
+  # }
+  
+  # Get myplot using tryCatch
+  myplot <- tryCatch(
+    expr = {
+      myplot <- go_terms %>%
+        enrichplot::emapplot(showCategory = n) +
+        ggplot2::ggtitle(title)
+      return(myplot)
+    },
+    error = function(e){
+      message("Can't print emap. Possibly too few differentially expressed terms. Error:")
+      message(e)
+      return(null)
+    }
+  )
+  return(myplot)
 }
 
 #' Print a series of clusterProfiler plots
