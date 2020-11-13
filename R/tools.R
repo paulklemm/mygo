@@ -92,7 +92,7 @@ emap_plot <- function(go_terms, title, n = 30) {
     error = function(e){
       message("Can't print emap. Possibly too few differentially expressed terms. Error:")
       message(e)
-      return(null)
+      return(NULL)
     }
   )
   return(myplot)
