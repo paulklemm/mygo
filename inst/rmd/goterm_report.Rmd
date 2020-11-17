@@ -76,60 +76,30 @@ Settings
 
 <details>
 
-```{r setup, echo = FALSE, message = TRUE, warning = TRUE, results = 'asis'}
+```{r setup, warning = FALSE, message = FALSE}
+library(magrittr)
+library(enrichplot)
+library(magrittr)
+library(rmyknife)
+library(mygo)
+library(org.Mm.eg.db)
+library(AnnotationDbi)
+library(stats4)
+library(BiocGenerics)
+library(parallel)
+```
+```{r params, echo = FALSE, message = TRUE, warning = TRUE}
 
 # Retreive parameter settings
 
-rmd_params <- list()
-
-rmd_params$dat <- params$dat
-rmd_params$output_path <- params$output_path
-rmd_params$save_excel <- params$save_excel
-rmd_params$significance_cutoff <- params$significance_cutoff
-rmd_params$simplify_ontologies <- params$simplify_ontologies
-rmd_params$do_gse <- params$do_gse
-rmd_params$use_background <- params$use_background
-rmd_params$store_r_objects <- params$store_r_objects
-rmd_params$simplify_cutoff <- params$simplify_cutoff
-rmd_params$save_plots_as_pdf <- params$save_plots_as_pdf
-
-library(magrittr)
-suppressWarnings(library(mygo))
-suppressWarnings(library(enrichplot))
-suppressWarnings(library(org.Mm.eg.db))
-suppressWarnings(library(AnnotationDbi))
-suppressWarnings(library(stats4))
-suppressWarnings(library(BiocGenerics))
-suppressWarnings(library(parallel))
-suppressWarnings(library(rmyknife))
+rmd_params <- params
 
 # Print settings as table
-tibble::tibble(
-  name = c(
-    "output_path",
-    "save_excel",
-    "significance_cutoff",
-    "simplify_ontologies",
-    "do_gse",
-    "use_background",
-    "store_r_objects",
-    "simplify_cutoff",
-    "save_plots_as_pdf"
-  ),
-  setting = c(
-    rmd_params$output_path,
-    rmd_params$save_excel,
-    rmd_params$significance_cutoff,
-    rmd_params$simplify_ontologies,
-    rmd_params$do_gse,
-    rmd_params$use_background,
-    rmd_params$store_r_objects,
-    rmd_params$simplify_cutoff,
-    rmd_params$save_plots_as_pdf
-  )
-) %>%
-  knitr::kable()
+rmyknife::print_params(omit = "dat")
 
+```
+
+```{r check-data, results = "asis"}
 # Summary for parameter file
 message("Data table head")
 rmd_params$dat %>%
@@ -159,6 +129,7 @@ if (rmd_params$save_plots_as_pdf) {
     fig.path = paste0(file.path(rmd_params$output_path, "plots"), .Platform$file.sep)
   )
 }
+
 ```
 
 </details>
@@ -246,7 +217,7 @@ if (rmd_params$simplify_ontologies) {
   )
 }
 if (rmd_params$do_gse) {
-  dat_gse_go <- dat %>% get_gse_all_ontologies()
+  dat_gse_go <- dat %>% get_gse_all_ontologies(p_cutoff = rmd_params$significance_cutoff)
   dat_gse_kegg <- dat %>% get_kegg()
 } else {
   dat_gse_go <- list()
