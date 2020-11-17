@@ -4,10 +4,12 @@
 \alias{get_gse_all_ontologies}
 \title{Get GSE-terms for all ontologies}
 \usage{
-get_gse_all_ontologies(dat)
+get_gse_all_ontologies(dat, p_cutoff = 0.05)
 }
 \arguments{
 \item{dat}{Data frame containing columns \code{pValue} and \code{EntrezID}}
+
+\item{p_cutoff}{P-value cutoff for GSEA}
 }
 \description{
 Get GSE-terms for all ontologies

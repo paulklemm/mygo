@@ -4,10 +4,12 @@
 \alias{perform_gseGO}
 \title{Perform a clusterProfiler gseGO analysis}
 \usage{
-perform_gseGO(ontology, fc)
+perform_gseGO(ontology, fc, p_cutoff = 0.05)
 }
 \arguments{
 \item{fc}{Named vector of foldchanges (name denotes Entrez ID)}
+
+\item{p_cutoff}{P-value cutoff for GSEA}
 
 \item{ontoloty}{Can be either "BP", "CC", "MF"}
 }

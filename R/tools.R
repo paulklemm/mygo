@@ -364,15 +364,16 @@ get_named_fc_vector <- function(dat) {
 #' @import magrittr dplyr
 #' @export
 #' @param dat Data frame containing columns `pValue` and `EntrezID`
-get_gse_all_ontologies <- function(dat) {
+#' @param p_cutoff P-value cutoff for GSEA
+get_gse_all_ontologies <- function(dat, p_cutoff = 0.05) {
   # Prepare input data as required by GSE
   fc <- dat %>% get_named_fc_vector()
   gse_terms <- list()
   # Barplot of the fold change
   # fc %>% barplot()
-  gse_terms$Biological_Process <- perform_gseGO(ontology = 'BP', fc = fc)
-  gse_terms$Molecular_Function <- perform_gseGO(ontology = 'MF', fc = fc)
-  gse_terms$Cellular_Components <- perform_gseGO(ontology = 'CC', fc = fc)
+  gse_terms$Biological_Process <- perform_gseGO(ontology = 'BP', fc = fc, p_cutoff = p_cutoff)
+  gse_terms$Molecular_Function <- perform_gseGO(ontology = 'MF', fc = fc, p_cutoff = p_cutoff)
+  gse_terms$Cellular_Components <- perform_gseGO(ontology = 'CC', fc = fc, p_cutoff = p_cutoff)
   gse_terms %>% return()
 }
 
@@ -395,13 +396,13 @@ get_kegg <- function(dat) {
 #' @import magrittr clusterProfiler org.Mm.eg.db DOSE
 #' @param ontoloty Can be either "BP", "CC", "MF"
 #' @param fc Named vector of foldchanges (name denotes Entrez ID)
-perform_gseGO <- function(ontology, fc) {
-  clusterProfiler::gseGO(geneList = fc,
+#' @param p_cutoff P-value cutoff for GSEA
+perform_gseGO <- function(ontology, fc, p_cutoff = 0.05) {
+  clusterProfiler::gseGO(
+    geneList = fc,
     OrgDb = org.Mm.eg.db,
     ont = ontology,
-    minGSSize = 100,
-    maxGSSize = 500,
-    pvalueCutoff = 0.05,
+    pvalueCutoff = p_cutoff,
     verbose = FALSE
   ) %>%
     DOSE::setReadable(OrgDb = org.Mm.eg.db) %>%
