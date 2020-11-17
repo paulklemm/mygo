@@ -72,14 +72,11 @@ emap_plot <- function(go_terms, title, n = 30) {
     warning("Cannot print emap plot, no GO-terms")
     return()
   }
-  # # There is a bug with very small GO term selections that we have to catch
-  # # HACK
-  # if (go_terms %>% nrow() > 10) {
-  #   plot <- go_terms %>%
-  #     enrichplot::emapplot(showCategory = n) +
-  #     ggplot2::ggtitle(title)
-  #   return(plot)
-  # }
+  # There is a bug with very small GO term selections that we have to catch
+  # HACK
+  if (go_terms %>% nrow() <= 5) {
+    return()
+  }
   
   # Get myplot using tryCatch
   myplot <- tryCatch(
