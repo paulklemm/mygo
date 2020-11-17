@@ -163,6 +163,9 @@ devtools::install_github("paulklemm/mygo")
 
 ## History
 
+- *2020-11-17*
+  - Fix `emap_plot`
+  - Bump version to `0.0.12`
 - *2020-10-26*
   - Add `print_kegg`
   - Bump version to `0.0.10`

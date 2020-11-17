@@ -85,6 +85,9 @@ emap_plot <- function(go_terms, title, n = 30) {
   myplot <- tryCatch(
     expr = {
       myplot <- go_terms %>%
+        # Comply with latest implementation https://github.com/YuLab-SMU/clusterProfiler/issues/299
+        enrichplot::pairwise_termsim() %>%
+        # Run emapplot
         enrichplot::emapplot(showCategory = n) +
         ggplot2::ggtitle(title)
       return(myplot)
