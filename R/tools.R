@@ -134,6 +134,8 @@ plot_terms_gse <- function(gse_terms, fc_symbol) {
     return()
   }
   gse_terms %>%
+    # Comply with latest implementation https://github.com/YuLab-SMU/clusterProfiler/issues/299
+    enrichplot::pairwise_termsim() %>%
     enrichplot::emapplot() %>%
     print()
   gse_terms %>%
