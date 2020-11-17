@@ -95,7 +95,7 @@ library(parallel)
 rmd_params <- params
 
 # Print settings as table
-rmyknife::print_params(omit = "dat")
+rmyknife::print_params(rmd_params, omit = "dat")
 
 ```
 
