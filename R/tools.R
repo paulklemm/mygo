@@ -133,11 +133,15 @@ plot_terms_gse <- function(gse_terms, fc_symbol) {
     print("No go terms to plot")
     return()
   }
-  gse_terms %>%
-    # Comply with latest implementation https://github.com/YuLab-SMU/clusterProfiler/issues/299
-    enrichplot::pairwise_termsim() %>%
-    enrichplot::emapplot() %>%
-    print()
+  # There is a bug with very small GO term selections that we have to catch
+  # HACK
+  if (gse_terms %>% nrow() > 5) {
+    gse_terms %>%
+      # Comply with latest implementation https://github.com/YuLab-SMU/clusterProfiler/issues/299
+      enrichplot::pairwise_termsim() %>%
+      enrichplot::emapplot() %>%
+      print()
+  }
   gse_terms %>%
     enrichplot::heatplot(foldChange = fc_symbol) %>%
     print()
