@@ -32,4 +32,5 @@ Imports:
     knitr,
     rmyknife,
     forcats,
-    pathview
+    pathview,
+    ggnewscale
