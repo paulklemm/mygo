@@ -125,6 +125,7 @@ Internal use only.
 
 ```r
 
+# Local test run
 my_dat <- readr::read_tsv('test/geneexp_F_CPu.tsv') %>%
   dplyr::rename(fc = `log2(fold_change)`) %>%
   dplyr::mutate(Symbol = ensembl_gene_id) %>%
@@ -144,6 +145,34 @@ xaringan::infinite_moon_reader(
     use_background = TRUE,
     store_r_objects = FALSE,
     save_plots_as_pdf = FALSE
+  )
+)
+```
+
+Debug nfcore-rnaseq-pipeline run
+
+```r
+
+# Test for nfcore-rnaseq-pipeline output
+nfcore_pipeline_path <- "/beegfs/scratch/bruening_scratch/pklemm/2020-11-anna-rnaseq/nfcore-rnaseq-pipeline"
+dat <-
+  glue::glue("{nfcore_pipeline_path}/results/DESeq2/npc/deseq_diff/deseq2_diff.csv") %>%
+  readr::read_csv() %>%
+  # Create data frame compatible with mygo
+  dplyr::rename(
+    ensembl_gene_id = row,
+    q_value = padj,
+    fc = log2FoldChange,
+    Symbol = external_gene_name
+  ) %>%
+  dplyr::select(ensembl_gene_id, q_value, fc, Symbol)
+xaringan::infinite_moon_reader(
+  moon = "inst/rmd/goterm_report.Rmd",
+  cast_from=file.path(getwd(), "inst", "rmd"),
+  params = list(
+    dat = dat,
+    output_path = glue::glue("{nfcore_pipeline_path}/results/goterm-analyses/npc"),
+    significance_cutoff = 0.1
   )
 )
 
