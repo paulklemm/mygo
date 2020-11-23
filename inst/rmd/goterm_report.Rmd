@@ -79,7 +79,6 @@ Settings
 ```{r setup, warning = FALSE, message = FALSE}
 library(magrittr)
 library(enrichplot)
-library(magrittr)
 library(rmyknife)
 library(mygo)
 library(org.Mm.eg.db)
