@@ -483,34 +483,35 @@ overlap_percentage_plot <- function(dat, n = 25, order_by = "percentage") {
   # Order dat in the required way
   plot_title <- ""
   if (order_by == "percentage") {
-    dat %<>% dplyr::arrange(dplyr::desc(Percent_Significant))
-    plot_title <- paste0("Top ", n, " terms with highest overlap")
+    dat <-
+      dat %>%
+      dplyr::mutate(Description = forcats::fct_reorder(Description, Percent_Significant))
+    plot_title <- paste0("Top enriched terms ordered by highest overlap")
   } else if (order_by == "significance") {
-    dat %<>% dplyr::arrange(p.adjust)
-    plot_title <- paste0("Top ", n, " sig. terms, ordered by overlap")
+    dat <-
+      dat %>%
+      dplyr::mutate(Description = forcats::fct_reorder(Description, dplyr::desc(p.adjust)))
+    plot_title <- paste0("Top enriched terms ordered by significance")
   } else {
     warning(paste0("I don't know what to do with order_by parameter value ", order_by))
     return()
   }
-  plot <- dat %>%
+  dat %>%
     dplyr::rename(`Significant Gene Count` = Count) %>%
     head(n) %>%
     ggplot2::ggplot(
       mapping = ggplot2::aes(
         Percent_Significant,
-        forcats::fct_reorder(Description, Percent_Significant)
+        Description
       )
     ) +
       ggplot2::geom_segment(ggplot2::aes(xend = 0, yend = Description)) +
       ggplot2::geom_point(ggplot2::aes(color = p.adjust, size = `Significant Gene Count`)) +
-      # ggplot2::scale_color_viridis_c(guide = ggplot2::guide_colorbar(reverse = TRUE)) +
       ggplot2::scale_color_continuous(high = "#132B43", low = "#56B1F7") +
       ggplot2::scale_size_continuous(range = c(1, 5)) +
-      ggplot2::theme_minimal() +
       ggplot2::xlab("Percentage of Significant Genes") +
       ggplot2::ylab(NULL) +
       ggplot2::ggtitle(plot_title)
-  return(plot)
 }
 
 #' Helper function, takes clusterProfiler GO-term result and prints it as DT widget
