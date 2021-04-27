@@ -541,6 +541,8 @@ print_goterm_as_datatable <- function(dat) {
 #' @export
 #' @import pathview magrittr dplyr png
 #' @return png object
+#' @examples
+#'   mygo::plot_kegg(kegg_dat, pathway = "mmu04110") %>% mygo::plot_png()
 plot_kegg <- function(
   dat,
   pathway,

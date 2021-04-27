@@ -19,3 +19,6 @@ png object
 \description{
 Create KEGG pathway as PNG
 }
+\examples{
+  mygo::plot_kegg(kegg_dat, pathway = "mmu04110") \%>\% mygo::plot_png()
+}
