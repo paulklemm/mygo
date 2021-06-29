@@ -194,7 +194,8 @@ devtools::install_github("paulklemm/mygo")
 
 - *2021-06-29*
   - Add `set_readable` of DOSE to fix ridgeplot
-  - Bump to `0.0.14`
+  - Add `simplify` option for GSEA
+  - Bump to `0.0.15`
 - *2021-04-12*
   - Fix sorting of `overlap_percentage_plot`
   - Bump version to `0.0.13`
