@@ -4,12 +4,14 @@
 \alias{get_gse_all_ontologies}
 \title{Get GSE-terms for all ontologies}
 \usage{
-get_gse_all_ontologies(dat, p_cutoff = 0.05)
+get_gse_all_ontologies(dat, p_cutoff = 0.05, set_readable = TRUE)
 }
 \arguments{
-\item{dat}{Data frame containing columns \code{pValue} and \code{EntrezID}}
+\item{dat}{Table containing columns \code{fc} and \code{EntrezID}}
 
 \item{p_cutoff}{P-value cutoff for GSEA}
+
+\item{set_readable}{Replace EntrezIDs by readable gene names. This causes problems with ridgeplot}
 }
 \description{
 Get GSE-terms for all ontologies

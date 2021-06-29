@@ -369,17 +369,32 @@ get_named_fc_vector <- function(dat) {
 #'
 #' @import magrittr dplyr
 #' @export
-#' @param dat Data frame containing columns `pValue` and `EntrezID`
+#' @param dat Table containing columns `fc` and `EntrezID`
 #' @param p_cutoff P-value cutoff for GSEA
-get_gse_all_ontologies <- function(dat, p_cutoff = 0.05) {
+#' @param set_readable Replace EntrezIDs by readable gene names. This causes problems with ridgeplot
+get_gse_all_ontologies <- function(dat, p_cutoff = 0.05, set_readable = TRUE) {
   # Prepare input data as required by GSE
   fc <- dat %>% get_named_fc_vector()
   gse_terms <- list()
-  # Barplot of the fold change
-  # fc %>% barplot()
-  gse_terms$Biological_Process <- perform_gseGO(ontology = 'BP', fc = fc, p_cutoff = p_cutoff)
-  gse_terms$Molecular_Function <- perform_gseGO(ontology = 'MF', fc = fc, p_cutoff = p_cutoff)
-  gse_terms$Cellular_Components <- perform_gseGO(ontology = 'CC', fc = fc, p_cutoff = p_cutoff)
+  # Perform GSEA for all ontologies
+  gse_terms$Biological_Process <- perform_gseGO(
+    ontology = 'BP',
+    fc = fc,
+    p_cutoff = p_cutoff,
+    set_readable = set_readable
+  )
+  gse_terms$Molecular_Function <- perform_gseGO(
+    ontology = 'MF',
+    fc = fc,
+    p_cutoff = p_cutoff,
+    set_readable = set_readable
+  )
+  gse_terms$Cellular_Components <- perform_gseGO(
+    ontology = 'CC',
+    fc = fc,
+    p_cutoff = p_cutoff,
+    set_readable = set_readable
+  )
   gse_terms %>% return()
 }
 
@@ -400,10 +415,11 @@ get_kegg <- function(dat) {
 #'
 #' @export
 #' @import magrittr clusterProfiler org.Mm.eg.db DOSE
-#' @param ontoloty Can be either "BP", "CC", "MF"
+#' @param ontology Can be either "BP", "CC", "MF"
 #' @param fc Named vector of foldchanges (name denotes Entrez ID)
 #' @param p_cutoff P-value cutoff for GSEA
-perform_gseGO <- function(ontology, fc, p_cutoff = 0.05) {
+#' @param set_readable Replace EntrezIDs by readable gene names. This causes problems with ridgeplot
+perform_gseGO <- function(ontology, fc, p_cutoff = 0.05, set_readable = TRUE) {
   clusterProfiler::gseGO(
     geneList = fc,
     OrgDb = org.Mm.eg.db,

@@ -4,14 +4,16 @@
 \alias{perform_gseGO}
 \title{Perform a clusterProfiler gseGO analysis}
 \usage{
-perform_gseGO(ontology, fc, p_cutoff = 0.05)
+perform_gseGO(ontology, fc, p_cutoff = 0.05, set_readable = TRUE)
 }
 \arguments{
+\item{ontology}{Can be either "BP", "CC", "MF"}
+
 \item{fc}{Named vector of foldchanges (name denotes Entrez ID)}
 
 \item{p_cutoff}{P-value cutoff for GSEA}
 
-\item{ontoloty}{Can be either "BP", "CC", "MF"}
+\item{set_readable}{Replace EntrezIDs by readable gene names. This causes problems with ridgeplot}
 }
 \description{
 Perform a clusterProfiler gseGO analysis
