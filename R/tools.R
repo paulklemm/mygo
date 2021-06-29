@@ -430,7 +430,7 @@ perform_gseGO <- function(ontology, fc, p_cutoff = 0.05, set_readable = TRUE) {
   if (set_readable) {
     gse <-
       gse %>%
-      DOSE::setReadable(OrgDb = org.Mm.eg.db) %>%
+      DOSE::setReadable(OrgDb = org.Mm.eg.db)
   }
   return(gse)
 }
