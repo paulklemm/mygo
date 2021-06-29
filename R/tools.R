@@ -420,15 +420,19 @@ get_kegg <- function(dat) {
 #' @param p_cutoff P-value cutoff for GSEA
 #' @param set_readable Replace EntrezIDs by readable gene names. This causes problems with ridgeplot
 perform_gseGO <- function(ontology, fc, p_cutoff = 0.05, set_readable = TRUE) {
-  clusterProfiler::gseGO(
+  gse <- clusterProfiler::gseGO(
     geneList = fc,
     OrgDb = org.Mm.eg.db,
     ont = ontology,
     pvalueCutoff = p_cutoff,
     verbose = FALSE
-  ) %>%
-    DOSE::setReadable(OrgDb = org.Mm.eg.db) %>%
-    return()
+  )
+  if (set_readable) {
+    gse <-
+      gse %>%
+      DOSE::setReadable(OrgDb = org.Mm.eg.db) %>%
+  }
+  return(gse)
 }
 
 #' Perform a clusterProfiler gseKEGG analysis
