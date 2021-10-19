@@ -1,7 +1,6 @@
 #' Make GO-Term analysis and print out Report
 #'
 #' @export
-#' @import magrittr ggplot2 rmarkdown
 #' @param dat Dataframe containing variables `q_value` and `EntrezID` or `EnsemblID`
 #' @param save_excel Save GO-terms to Excel files
 #' @param significance_cutoff Specify the cutoff which entries are considered significant
@@ -61,7 +60,6 @@ createHTMLReport <- function(
 
 #' Create clusterProfiler EMA plot from go term
 #'
-#' @import magrittr clusterProfiler ggplot2 enrichplot
 #' @export
 #' @param go_terms clusterProfiler enrichResult object
 #' @param title ggtitle of the plot
@@ -101,7 +99,6 @@ emap_plot <- function(go_terms, title, n = 30) {
 #' Print a series of clusterProfiler plots
 #'
 #' @export
-#' @import magrittr clusterProfiler ggplot2 enrichplot plotly
 #' @param go_terms clusterProfiler enrichResult object
 #' @param fc_symbol double vector containing the fold changes named by symbol
 plot_terms_go <- function(go_terms, fc_symbol) {
@@ -125,7 +122,6 @@ plot_terms_go <- function(go_terms, fc_symbol) {
 #' Plot GSE terms
 #'
 #' @export
-#' @import clusterProfiler ggplot2
 #' @param gse_terms clusterProfiler gse terms object
 #' @param fc_symbol double vector containing the fold changes named by symbol
 plot_terms_gse <- function(gse_terms, fc_symbol) {
@@ -161,7 +157,6 @@ plot_terms_gse <- function(gse_terms, fc_symbol) {
 #' Simplify GO terms
 #'
 #' @export
-#' @import clusterProfiler magrittr purrr
 #' @param ontologies List of clusterProfiler enrichResult objects with elements BP, MF and CC
 #' @param cutoff See clusterProfiler::simplify
 simplify_ontologies <- function(ontologies, cutoff) {
@@ -176,7 +171,6 @@ simplify_ontologies <- function(ontologies, cutoff) {
 #' Perform a clusterPrfiler enrichGO analysis
 #'
 #' @export
-#' @import magrittr clusterProfiler org.Mm.eg.db
 #' @param ontology Can be either "BP", "CC", "MF"
 #' @param entrezgenes List of entrezgenes to use for GO analysis
 #' @param entrez_background_genes List of background genes
@@ -205,7 +199,6 @@ perform_enrichGO <- function(ontology, entrezgenes, background_genes, use_backgr
 #' Return a volcano plot with annotated top_n values
 #'
 #' @export
-#' @import ggplot2 ggrepel
 #' @param go_terms clusterProfiler enrichResult object
 volcano_plot <- function(dat, label_top_n = 20) {
   dat %<>% mutate(Significant = q_value <= 0.05)
@@ -218,7 +211,6 @@ volcano_plot <- function(dat, label_top_n = 20) {
 
 #' Get GO-terms for all ontologies
 #'
-#' @import magrittr dplyr
 #' @export
 #' @param dat Data frame containing columns `pValue` and `EntrezID`
 #' @param significance_cutoff Cutoff to consider genes as significant
@@ -260,7 +252,6 @@ get_go_all_ontologies <- function(dat, significance_cutoff = 0.05, use_backgroun
 #' Print a couple of standard plots for provided GO ontologies
 #'
 #' @export
-#' @import purrr magrittr
 #' @param ontologies List of clusterProfiler enrichResult objects with elements BP, MF and CC
 #' @param fc_symbol double vector containing the fold changes named by symbol
 plot_all_ontologies <- function(ontologies, fc_symbol) {
@@ -280,7 +271,6 @@ plot_all_ontologies <- function(ontologies, fc_symbol) {
 
 #' Add count for each GO-term and calculate overlap ratio of significant genes
 #' @export
-#' @import dplyr magrittr tibble
 #' @param dat clusterProfiler GO-term result DOSE
 attach_goterm_genecount <- function(
   dat
@@ -315,7 +305,6 @@ attach_goterm_genecount <- function(
 #' Export list of GO terms to Excel file
 #'
 #' @export
-#' @import WriteXLS tibble magrittr
 #' @param go_ontologies List of clusterProfiler enrichResult objects with elements BP, MF and CC
 #' @param go_ontologies_simple List of clusterProfiler enrichResult objects with elements BP, MF and CC after being simplified
 #' @param gse_ontologies GSE enrichResult
@@ -355,7 +344,6 @@ export_go_terms_to_excel <- function(
 #' Get named fc vector. Prepare input data as required by GSE
 #'
 #' @export
-#' @import magrittr clusterProfiler
 #' @param dat Dataframe with columns `EntrezID` and `fc`
 get_named_fc_vector <- function(dat) {
   # https://bioconductor.org/packages/release/bioc/vignettes/clusterProfiler/inst/doc/clusterProfiler.html#go-gene-set-enrichment-analysis
@@ -367,7 +355,6 @@ get_named_fc_vector <- function(dat) {
 
 #' Get GSE-terms for all ontologies
 #'
-#' @import magrittr dplyr
 #' @export
 #' @param dat Table containing columns `fc` and `EntrezID`
 #' @param p_cutoff P-value cutoff for GSEA
@@ -416,7 +403,6 @@ get_gse_all_ontologies <- function(
 
 #' Get KEGG GSE terms
 #'
-#' @import magrittr dplyr
 #' @export
 #' @param dat Data frame containing columns `pValue` and `EntrezID`
 get_kegg <- function(dat) {
@@ -430,7 +416,6 @@ get_kegg <- function(dat) {
 #' Perform a clusterProfiler gseGO analysis
 #'
 #' @export
-#' @import magrittr clusterProfiler org.Mm.eg.db DOSE
 #' @param ontology Can be either "BP", "CC", "MF"
 #' @param fc Named vector of foldchanges (name denotes Entrez ID)
 #' @param p_cutoff P-value cutoff for GSEA
@@ -454,7 +439,6 @@ perform_gseGO <- function(ontology, fc, p_cutoff = 0.05, set_readable = TRUE) {
 #' Perform a clusterProfiler gseKEGG analysis
 #'
 #' @export
-#' @import magrittr clusterProfiler DOSE
 #' @param fc Named vector of foldchanges (name denotes Entrez ID)
 perform_gseKEGG <- function(fc) {
   fc %>% clusterProfiler::gseKEGG(organism = "mmu") %>%
@@ -463,7 +447,6 @@ perform_gseKEGG <- function(fc) {
 
 #' Plot total gene count against percentage of significant genes
 #' @export
-#' @import ggrepel ggplot2 magrittr dplyr ggthemes
 #' @param dat clusterProfiler GO-term table with attached GOTermGeneCount and Percent_Significant column
 #' @param n Number of GO-terms to label
 #' @examples
@@ -506,7 +489,6 @@ overlap_scatterplot <- function(
 #' @param n Number of GO-terms to label
 #' @order_by Order by overlap "percentage" or "significance"
 #' @export
-#' @import ggplot2 forcats magrittr
 #' @examples
 #'   dat_goterms$Biological_Process %>%
 #'     mygo::attach_goterm_genecount() %>%
@@ -552,7 +534,6 @@ overlap_percentage_plot <- function(dat, n = 25, order_by = "percentage") {
 
 #' Helper function, takes clusterProfiler GO-term result and prints it as DT widget
 #' @export
-#' @import DT dplyr tibble magrittr
 #' @param dat clusterProfiler GO-term result
 print_goterm_as_datatable <- function(dat) {
   # Check if dat is null
@@ -575,7 +556,6 @@ print_goterm_as_datatable <- function(dat) {
 #' @param pathway kegg pathway name
 #' @param species kegg species ID
 #' @export
-#' @import pathview magrittr dplyr png
 #' @return png object
 #' @examples
 #'   mygo::plot_kegg(kegg_dat, pathway = "mmu04110") %>% mygo::plot_png()
@@ -616,7 +596,6 @@ plot_kegg <- function(
 
 #' Plot png object (e.g. from plot_kegg_pathway)
 #' @param png object
-#' @import png magrittr
 #' @export
 plot_png <- function(png) {
   png %>%
