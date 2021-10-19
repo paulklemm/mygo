@@ -623,3 +623,76 @@ plot_png <- function(png) {
     as.raster() %>%
     plot()
 }
+
+#' Combine goterms into a single data frame
+#' 
+#' @export
+#' @param dat clusterProfiler result
+#' @return data frame with goterms and GO-term source column
+bind_goterm_table <- function(dat) {
+  conversion_helper <- function(dat) {
+    dat %>%
+      tibble::as_tibble() %>%
+      mygo::attach_goterm_genecount() %>%
+      dplyr::select(-pvalue, -qvalue) %>%
+      dplyr::select(dplyr::everything(), geneID)
+  }
+  dplyr::bind_rows(
+    dat$Biological_Process %>%
+      conversion_helper() %>%
+      dplyr::mutate(source = "Biological Process"),
+    dat$Cellular_Components %>%
+      conversion_helper() %>%
+      dplyr::mutate(source = "Cellular Component"),
+    dat$Molecular_Function %>%
+      conversion_helper() %>%
+      dplyr::mutate(source = "Molecular Function")
+  )
+}
+
+#' Combine emap plots into one ggplot2 plot
+#' 
+#' @param dat clusterProfiler result
+#' @param n See enrichplot::emapplot
+#' @return ggplot2 plot
+#' @export
+emap_plot_facet_category <- function(dat, n = 50) {
+  dat$Biological_Process %>%
+    mygo::emap_plot("Enrich Map Biological Process", n) +
+    dat$Cellular_Components %>%
+    mygo::emap_plot("Enrich Map Cellular Component", n) +
+    dat$Molecular_Function %>%
+    mygo::emap_plot("Enrich Map Molecular Function", n)
+}
+
+#' Wrapper for mygo::overlap_percentage_plot to facet all GO categories
+#' 
+#' @param dat clusterProfiler result
+#' @param order_by See mygo::overlap_percentage_plot
+#' @param n See mygo::overlap_percentage_plot
+#' @return ggplot2 object
+#' @export
+overlap_percentage_plot_facet_category <- function(
+  dat,
+  order_by = "significance",
+  n = 20
+) {
+  dat %>%
+    # Attach goterm gene count to all terms
+    purrr::imap(~
+      .x %>%
+        tibble::as_tibble() %>%
+        mygo::attach_goterm_genecount() %>%
+        dplyr::mutate(source = .y)
+    ) %>%
+    # Bind into a single dataframe
+    dplyr::bind_rows() %>%
+    dplyr::group_by(source) %>%
+    dplyr::slice_head(n = n) %>%
+    mygo::overlap_percentage_plot(
+      order_by = order_by,
+      # n doesn't matter since we already sliced the data
+      n = 1e10
+    ) +
+      ggplot2::facet_grid(source~., scales = "free")
+}
