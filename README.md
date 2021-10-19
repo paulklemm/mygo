@@ -192,6 +192,10 @@ devtools::install_github("paulklemm/mygo")
 
 ## History
 
+- *2021-10-19*
+  - Add `bind_goterm_table`, `emap_plot_facet_category`, `overlap_percentage_plot_facet_category`
+  - Remove all imports except `magrittr`
+  - Bump version to 0.1.0
 - *2021-06-29*
   - Add `set_readable` of DOSE to fix ridgeplot
   - Add `simplify` option for GSEA
