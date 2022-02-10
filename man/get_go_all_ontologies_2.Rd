@@ -10,6 +10,8 @@ get_go_all_ontologies_2(dat, use_background = TRUE)
 \item{dat}{Data frame containing columns \code{significant} and \code{EntrezID}}
 
 \item{use_background}{Use gene list as background instead of using all genes as background}
+
+\item{species}{Either "HUM" or "MUS"}
 }
 \description{
 Get GO-terms for all ontologies. This method requires a \code{significant} flag in the data frame

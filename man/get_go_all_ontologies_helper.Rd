@@ -7,7 +7,8 @@
 get_go_all_ontologies_helper(
   significant_entrezgenes,
   background_entrezgenes,
-  use_background
+  use_background,
+  species
 )
 }
 \arguments{
@@ -16,6 +17,8 @@ get_go_all_ontologies_helper(
 \item{background_entrezgenes}{Vector of background genes as Entrez-IDs}
 
 \item{use_background}{Use background entrezgenes Vector}
+
+\item{species}{Either "HUM" or "MUS"}
 }
 \description{
 Helper function getting all GO-terms based on vectors of Entrez-IDs

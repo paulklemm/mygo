@@ -175,11 +175,26 @@ simplify_ontologies <- function(ontologies, cutoff) {
 #' @param entrezgenes List of entrezgenes to use for GO analysis
 #' @param entrez_background_genes List of background genes
 #' @param use_background use specified background genes
-perform_enrichGO <- function(ontology, entrezgenes, background_genes, use_background) {
+#' @param species Species to use for GO analysis, either "HUM" or "MUS"
+perform_enrichGO <- function(
+  ontology,
+  entrezgenes,
+  background_genes,
+  use_background,
+  species
+) {
+  if (species == "MUS") {
+    org_db <- org.Mm.eg.db::org.Mm.eg.db
+  } else if (species == "HUM") {
+    org_db <- org.Hs.eg.db::org.Hs.eg.db
+  } else {
+    paste0("Unknown species: ", species) %>%
+      stop()
+  }
   if (use_background) {
     clusterProfiler::enrichGO(
       gene = entrezgenes,
-      OrgDb = org.Mm.eg.db::org.Mm.eg.db,
+      OrgDb = org_db,
       universe = background_genes,
       ont = ontology,
       readable = TRUE
@@ -188,7 +203,7 @@ perform_enrichGO <- function(ontology, entrezgenes, background_genes, use_backgr
   } else {
     clusterProfiler::enrichGO(
       gene = entrezgenes,
-      OrgDb = org.Mm.eg.db::org.Mm.eg.db,
+      OrgDb = org_db,
       ont = ontology,
       readable = TRUE
     ) %>%
@@ -215,10 +230,12 @@ volcano_plot <- function(dat, label_top_n = 20) {
 #' @param dat Data frame containing columns `pValue` and `EntrezID`
 #' @param significance_cutoff Cutoff to consider genes as significant
 #' @param use_background Use gene list as background instead of using all genes as background
+#' @param species Either "HUM" or "MUS"
 get_go_all_ontologies <- function(
   dat,
   significance_cutoff = 0.05,
-  use_background = TRUE
+  use_background = TRUE,
+  species = "MUS"
 ) {
   # Prepare data frame
   valid_dat <- dat %>%
@@ -237,7 +254,8 @@ get_go_all_ontologies <- function(
   get_go_all_ontologies_helper(
     significant_entrezgenes,
     background_entrezgenes,
-    use_background
+    use_background,
+    species
   ) %>%
     return()
 }
@@ -247,6 +265,7 @@ get_go_all_ontologies <- function(
 #' @export
 #' @param dat Data frame containing columns `significant` and `EntrezID`
 #' @param use_background Use gene list as background instead of using all genes as background
+#' @param species Either "HUM" or "MUS"
 get_go_all_ontologies_2 <- function(
   dat,
   use_background = TRUE
@@ -270,7 +289,8 @@ get_go_all_ontologies_2 <- function(
   get_go_all_ontologies_helper(
     significant_entrezgenes,
     background_entrezgenes,
-    use_background
+    use_background,
+    species
   ) %>%
     return()
 }
@@ -281,11 +301,16 @@ get_go_all_ontologies_2 <- function(
 #' @param significant_entrezgenes Vector of significant genes as Entrez-IDs
 #' @param background_entrezgenes Vector of background genes as Entrez-IDs
 #' @param use_background Use background entrezgenes Vector
+#' @param species Either "HUM" or "MUS"
 get_go_all_ontologies_helper <- function(
   significant_entrezgenes,
   background_entrezgenes,
-  use_background
+  use_background,
+  species
 ) {
+  # Diagnostics Species output
+  paste0("Get GO-terms for all ontologies for species ", species) %>%
+    message()
   # Perform GO-term analysis for each ontology
   go_terms <- list()
   go_terms$Biological_Process <-
@@ -293,21 +318,24 @@ get_go_all_ontologies_helper <- function(
     perform_enrichGO(
       ontology = "BP",
       background_genes = background_entrezgenes,
-      use_background = use_background
+      use_background = use_background,
+      species = species
     )
   go_terms$Molecular_Function <-
     significant_entrezgenes %>%
     perform_enrichGO(
       ontology = "MF",
       background_genes = background_entrezgenes,
-      use_background = use_background
+      use_background = use_background,
+      species = species
     )
   go_terms$Cellular_Components <-
     significant_entrezgenes %>%
     perform_enrichGO(
       ontology = "CC",
       background_genes = background_entrezgenes,
-      use_background = use_background
+      use_background = use_background,
+      species = species
     )
   return(go_terms)
 }
