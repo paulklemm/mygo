@@ -268,7 +268,8 @@ get_go_all_ontologies <- function(
 #' @param species Either "HUM" or "MUS"
 get_go_all_ontologies_2 <- function(
   dat,
-  use_background = TRUE
+  use_background = TRUE,
+  species = "MUS"
 ) {
   # Prepare data frame
   valid_dat <-
