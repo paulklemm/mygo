@@ -4,7 +4,7 @@
 \alias{get_go_all_ontologies_2}
 \title{Get GO-terms for all ontologies. This method requires a \code{significant} flag in the data frame}
 \usage{
-get_go_all_ontologies_2(dat, use_background = TRUE)
+get_go_all_ontologies_2(dat, use_background = TRUE, species = "MUS")
 }
 \arguments{
 \item{dat}{Data frame containing columns \code{significant} and \code{EntrezID}}
