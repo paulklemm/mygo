@@ -215,7 +215,11 @@ volcano_plot <- function(dat, label_top_n = 20) {
 #' @param dat Data frame containing columns `pValue` and `EntrezID`
 #' @param significance_cutoff Cutoff to consider genes as significant
 #' @param use_background Use gene list as background instead of using all genes as background
-get_go_all_ontologies <- function(dat, significance_cutoff = 0.05, use_background = TRUE) {
+get_go_all_ontologies <- function(
+  dat,
+  significance_cutoff = 0.05,
+  use_background = TRUE
+) {
   # Prepare data frame
   valid_dat <- dat %>%
     dplyr::filter(!is.na(EntrezID)) %>%
@@ -229,24 +233,83 @@ get_go_all_ontologies <- function(dat, significance_cutoff = 0.05, use_backgroun
   significant_entrezgenes <- valid_dat %>%
     dplyr::filter(q_value <= significance_cutoff) %>%
     .$EntrezID
-  # Perform GO-term analysis for each term
+  
+  get_go_all_ontologies_helper(
+    significant_entrezgenes,
+    background_entrezgenes,
+    use_background
+  ) %>%
+    return()
+}
+
+#' Get GO-terms for all ontologies. This method requires a `significant` flag in the data frame
+#'
+#' @export
+#' @param dat Data frame containing columns `significant` and `EntrezID`
+#' @param use_background Use gene list as background instead of using all genes as background
+get_go_all_ontologies_2 <- function(
+  dat,
+  use_background = TRUE
+) {
+  # Prepare data frame
+  valid_dat <-
+    dat %>%
+    dplyr::filter(!is.na(EntrezID)) %>%
+    dplyr::mutate(EntrezID = as.character(EntrezID))
+
+  # Get all genes in the data set as background universe
+  background_entrezgenes <-
+    valid_dat %>%
+    .$EntrezID
+  # Get significant genes
+  significant_entrezgenes <-
+    valid_dat %>%
+    dplyr::filter(significant == TRUE) %>%
+    .$EntrezID
+  
+  get_go_all_ontologies_helper(
+    significant_entrezgenes,
+    background_entrezgenes,
+    use_background
+  ) %>%
+    return()
+}
+
+#' Helper function getting all GO-terms based on vectors of Entrez-IDs
+#'
+#' @export
+#' @param significant_entrezgenes Vector of significant genes as Entrez-IDs
+#' @param background_entrezgenes Vector of background genes as Entrez-IDs
+#' @param use_background Use background entrezgenes Vector
+get_go_all_ontologies_helper <- function(
+  significant_entrezgenes,
+  background_entrezgenes,
+  use_background
+) {
+  # Perform GO-term analysis for each ontology
   go_terms <- list()
-  go_terms$Biological_Process <- significant_entrezgenes %>% perform_enrichGO(
-    ontology = "BP",
-    background_genes = background_entrezgenes,
-    use_background = use_background
-  )
-  go_terms$Molecular_Function <- significant_entrezgenes %>% perform_enrichGO(
-    ontology = "MF",
-    background_genes = background_entrezgenes,
-    use_background = use_background
-  )
-  go_terms$Cellular_Components <- significant_entrezgenes %>% perform_enrichGO(
-    ontology = "CC",
-    background_genes = background_entrezgenes,
-    use_background = use_background
-  )
-  go_terms %>% return()
+  go_terms$Biological_Process <-
+    significant_entrezgenes %>%
+    perform_enrichGO(
+      ontology = "BP",
+      background_genes = background_entrezgenes,
+      use_background = use_background
+    )
+  go_terms$Molecular_Function <-
+    significant_entrezgenes %>%
+    perform_enrichGO(
+      ontology = "MF",
+      background_genes = background_entrezgenes,
+      use_background = use_background
+    )
+  go_terms$Cellular_Components <-
+    significant_entrezgenes %>%
+    perform_enrichGO(
+      ontology = "CC",
+      background_genes = background_entrezgenes,
+      use_background = use_background
+    )
+  return(go_terms)
 }
 
 #' Print a couple of standard plots for provided GO ontologies

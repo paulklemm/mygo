@@ -192,6 +192,9 @@ devtools::install_github("paulklemm/mygo")
 
 ## History
 
+- *2022-02-10*
+  - Add `get_go_all_ontologies_2` as a more flexible way of providing significant genes
+  - Bump version to 0.1.1
 - *2021-10-19*
   - Add `bind_goterm_table`, `emap_plot_facet_category`, `overlap_percentage_plot_facet_category`
   - Remove all imports except `magrittr`
