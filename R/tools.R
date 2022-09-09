@@ -767,3 +767,71 @@ overlap_percentage_plot_facet_category <- function(
     ) +
       ggplot2::facet_grid(source~., scales = "free")
 }
+
+#' Run GO-Term analysis and retrieve plots
+#' This is for usage in custom analysis scripts
+#' @param dat Table containing `ensembl_gene_id` and `padj`
+#' @param significance_cutoff Adjusted p-value cutoff
+#' @param use_background Use whole table as gene background
+#' @param simplify Summarise GO-terms
+#' @param simplify_cutoff When summarising, use this cutoff
+#' @return list containing plots and table outputs
+#' @export
+run_goterms <- function(
+  dat,
+  significance_cutoff = .05,
+  use_background = FALSE,
+  simplify = TRUE,
+  simplify_cutoff = .7
+) {
+  # Get memoised versions to speed up repeated analyses
+  get_go_all_ontologies <- rmyknife::get_memoised(mygo::get_go_all_ontologies)
+  simplify_ontologies <- rmyknife::get_memoised(mygo::simplify_ontologies)
+
+  result <- list()
+  result$goterms <-
+    dat %>%
+    dplyr::rename(q_value = padj) %>%
+    rmyknife::ensembl_to_entrez(
+      ensembl_id_name = "ensembl_gene_id",
+      keep_only_rows_with_entrez = TRUE,
+      drop_duplicates = TRUE
+    ) %>%
+    rmyknife::attach_gene_symbol_from_entrez() %>%
+    get_go_all_ontologies(
+      use_background = use_background,
+      significance_cutoff = significance_cutoff
+    )
+  # Optionally simplify the ontologies
+  if (simplify) {
+    result$goterms <-
+      result$goterms %>%
+      simplify_ontologies(cutoff = simplify_cutoff)
+  }
+
+  result$plot_emap_bp <-
+    result$goterms$Biological_Process %>%
+    mygo::emap_plot("Enrich Map Biological Process")
+  
+  result$plot_emap_cc <-
+    result$goterms$Cellular_Components %>%
+    mygo::emap_plot("Enrich Map Cellular Component")
+  
+  result$plot_emap_mf <-
+    result$goterms$Molecular_Function %>%
+    mygo::emap_plot("Enrich Map Molecular Function")
+  
+  result$dt <-
+    result$goterms %>%
+    mygo::bind_goterm_table() %>%
+    rmyknife::dt_datatable()
+  
+  result$plot_percentage <-
+    result$goterms %>%
+    mygo::overlap_percentage_plot_facet_category(
+      order_by = "significance",
+      n = 20
+    )
+  
+  return(result)
+}

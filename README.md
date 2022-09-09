@@ -192,6 +192,8 @@ devtools::install_github("paulklemm/mygo")
 
 ## History
 
+- *2022-09-09*
+  - Add `run_goterms` for usage in scripts
 - *2022-02-10*
   - Add `get_go_all_ontologies_2` as a more flexible way of providing significant genes
   - Bump version to 0.1.1

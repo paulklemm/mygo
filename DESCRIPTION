@@ -1,6 +1,6 @@
 Package: mygo
 Title: Create Report for mus musculus dataset of GO-term analysis using clusterProfiler
-Version: 0.1.1
+Version: 0.1.2
 Authors@R: 
     person(given = "Paul",
         family = "Klemm",
@@ -13,7 +13,7 @@ Encoding: UTF-8
 LazyData: true
 biocViews:
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.1
 Imports: 
     DOSE,
     DT,
@@ -37,4 +37,3 @@ Imports:
     knitr,
     rmyknife,
     ggnewscale
-
