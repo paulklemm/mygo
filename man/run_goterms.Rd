@@ -14,7 +14,7 @@ run_goterms(
 )
 }
 \arguments{
-\item{dat}{Table containing \code{ensembl_gene_id} and \code{padj}}
+\item{dat}{Table containing \code{ensembl_gene_id}, \code{padj} and optionally \code{log2FoldChange}}
 
 \item{significance_cutoff}{Adjusted p-value cutoff}
 
