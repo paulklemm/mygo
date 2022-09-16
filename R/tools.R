@@ -705,9 +705,17 @@ bind_goterm_table <- function(dat) {
     dat %>%
       tibble::as_tibble() %>%
       mygo::attach_goterm_genecount() %>%
-      dplyr::select(-pvalue, -qvalue) %>%
       dplyr::select(dplyr::everything(), geneID)
+    
+    if ("pvalue" %in% names(dat)) {
+      dat <- dplyr::select(dat, -pvalue)
+    }
+    if ("qvalue" %in% names(dat)) {
+      dat <- dplyr::select(dat, -qvalue)
+    }
+    return(dat)
   }
+  
   dplyr::bind_rows(
     dat$Biological_Process %>%
       conversion_helper() %>%
