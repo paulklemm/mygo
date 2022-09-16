@@ -770,7 +770,7 @@ overlap_percentage_plot_facet_category <- function(
 
 #' Run GO-Term analysis and retrieve plots
 #' This is for usage in custom analysis scripts
-#' @param dat Table containing `ensembl_gene_id` and `padj`
+#' @param dat Table containing `ensembl_gene_id`, `padj` and optionally `log2FoldChange`
 #' @param significance_cutoff Adjusted p-value cutoff
 #' @param use_background Use whole table as gene background
 #' @param simplify Summarise GO-terms
@@ -833,5 +833,30 @@ run_goterms <- function(
       n = 20
     )
   
+  # Operations related to log2FoldChange
+  has_log2fc <- !is.null(dat$log2FoldChange)
+  if (has_log2fc) {
+    result$volcano <-
+      dat %>%
+      rmyknife::plot_volcano(
+        min_padj = significance_cutoff,
+        min_log2fc = 0
+      )
+    
+    result$goterm_genes <-
+      result$goterms %>%
+      mygo::bind_goterm_table() %>%
+      dplyr::select(source, ID, Description, geneID) %>%
+      dplyr::rename(external_gene_name = geneID) %>%
+      tidyr::separate_rows(external_gene_name, sep = "/") %>%
+      dplyr::left_join(
+        dat %>%
+          dplyr::select(ensembl_gene_id, external_gene_name, padj, log2FoldChange),
+        by = "external_gene_name"
+      ) %>%
+      dplyr::group_by(ID) %>%
+      dplyr::arrange(dplyr::desc(log2FoldChange), .by_group = TRUE)
+  }
+
   return(result)
 }
