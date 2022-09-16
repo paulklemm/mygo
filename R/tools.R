@@ -702,7 +702,8 @@ plot_png <- function(png) {
 #' @return data frame with goterms and GO-term source column
 bind_goterm_table <- function(dat) {
   conversion_helper <- function(dat) {
-    dat %>%
+    dat <-
+      dat %>%
       tibble::as_tibble() %>%
       mygo::attach_goterm_genecount() %>%
       dplyr::select(dplyr::everything(), geneID)
@@ -715,7 +716,7 @@ bind_goterm_table <- function(dat) {
     }
     return(dat)
   }
-  
+
   dplyr::bind_rows(
     dat$Biological_Process %>%
       conversion_helper() %>%
