@@ -701,33 +701,16 @@ plot_png <- function(png) {
 #' @param dat clusterProfiler result
 #' @return data frame with goterms and GO-term source column
 bind_goterm_table <- function(dat) {
-  conversion_helper <- function(dat) {
-    dat <-
-      dat %>%
-      tibble::as_tibble() %>%
-      mygo::attach_goterm_genecount() %>%
-      dplyr::select(dplyr::everything(), geneID)
-    
-    if ("pvalue" %in% names(dat)) {
-      dat <- dplyr::select(dat, -pvalue)
-    }
-    if ("qvalue" %in% names(dat)) {
-      dat <- dplyr::select(dat, -qvalue)
-    }
-    return(dat)
-  }
-
-  dplyr::bind_rows(
-    dat$Biological_Process %>%
-      conversion_helper() %>%
-      dplyr::mutate(source = "Biological Process"),
-    dat$Cellular_Components %>%
-      conversion_helper() %>%
-      dplyr::mutate(source = "Cellular Component"),
-    dat$Molecular_Function %>%
-      conversion_helper() %>%
-      dplyr::mutate(source = "Molecular Function")
-  )
+  dat %>%
+    purrr::imap(function(domain, domain_name) {
+      domain %>%
+        tibble::as_tibble() %>%
+        mygo::attach_goterm_genecount() %>%
+        dplyr::select(dplyr::everything(), geneID) %>%
+        dplyr::select(-c(pvalue, qvalue)) %>%
+        dplyr::mutate(source = stringr::str_replace(domain_name, "_", " "))
+    }) %>%
+    dplyr::bind_rows()
 }
 
 #' Combine emap plots into one ggplot2 plot
