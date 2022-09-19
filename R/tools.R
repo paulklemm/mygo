@@ -800,6 +800,11 @@ run_goterms <- function(
       result$goterms %>%
       simplify_ontologies(cutoff = simplify_cutoff)
   }
+  # Are the goterms valid?
+  valid_goterms <- (result$goterms %>% length() > 0)
+  if (!valid_goterms) {
+    warning("We found no GO-terms.")
+  }
 
   result$plot_emap_bp <-
     result$goterms$Biological_Process %>%
@@ -818,16 +823,18 @@ run_goterms <- function(
     mygo::bind_goterm_table() %>%
     rmyknife::dt_datatable()
   
-  result$plot_percentage <-
-    result$goterms %>%
-    mygo::overlap_percentage_plot_facet_category(
-      order_by = "significance",
-      n = 20
-    )
+  if (valid_goterms) {
+    result$plot_percentage <-
+      result$goterms %>%
+      mygo::overlap_percentage_plot_facet_category(
+        order_by = "significance",
+        n = 20
+      )
+  }
   
   # Operations related to log2FoldChange
   has_log2fc <- !is.null(dat$log2FoldChange)
-  if (has_log2fc) {
+  if (has_log2fc & valid_goterms) {
     result$volcano <-
       dat %>%
       rmyknife::plot_volcano(
