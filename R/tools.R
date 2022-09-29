@@ -842,6 +842,7 @@ run_goterms <- function(
         min_log2fc = 0
       )
     
+    # Get genes per GO-term ordered by log2FoldChange
     result$goterm_genes <-
       result$goterms %>%
       mygo::bind_goterm_table() %>%
@@ -854,7 +855,9 @@ run_goterms <- function(
         by = "external_gene_name"
       ) %>%
       dplyr::group_by(ID) %>%
-      dplyr::arrange(dplyr::desc(log2FoldChange), .by_group = TRUE)
+      dplyr::arrange(dplyr::desc(log2FoldChange), .by_group = TRUE) %>%
+      # Remove grouping
+      dplyr::ungroup()
   }
 
   return(result)
