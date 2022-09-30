@@ -899,3 +899,49 @@ run_goterms <- function(
 
   return(result)
 }
+
+#' Get Table containing Kegg pathway information `pathway`, `ensembl_gene_id`, `kegg_name`
+#' @param species Species string, either "MUS" or "HUM"
+#' @return Table containing Kegg pathway information `pathway`, `ensembl_gene_id`, `kegg_name`
+#' @export
+#' @examples
+#' get_kegg_table("MUS")
+get_kegg_table <- function(species = "MUS") {
+  # Get memoised versions
+  keggGet <- rmyknife::get_memoised(KEGGREST::keggGet)
+  keggLink <- rmyknife::get_memoised(KEGGREST::keggLink)
+  # Get KEGG pathways for each species
+  if (species == "MUS") {
+    kegg_dat <-
+      keggLink("pathway", "mmu") %>% 
+      tibble::tibble(pathway = ., eg = sub("mmu:", "", names(.))) %>%
+      dplyr::mutate(
+        # symbol = AnnotationDbi::mapIds(org.Hs.eg.db::org.Hs.eg.db, eg, "SYMBOL", "ENTREZID"),
+        ensembl_gene_id = AnnotationDbi::mapIds(org.Mm.eg.db::org.Mm.eg.db, eg, "ENSEMBL", "ENTREZID")
+      )
+  } else if (species == "HUM") {
+    kegg_dat <-
+      keggLink("pathway", "hsa") %>% 
+      tibble::tibble(pathway = ., eg = sub("hsa:", "", names(.))) %>%
+      dplyr::mutate(
+        # symbol = AnnotationDbi::mapIds(org.Hs.eg.db::org.Hs.eg.db, eg, "SYMBOL", "ENTREZID"),
+        ensembl_gene_id = AnnotationDbi::mapIds(org.Hs.eg.db::org.Hs.eg.db, eg, "ENSEMBL", "ENTREZID")
+      )
+  } else {
+    paste0("Species ", species, " not supported") %>%
+      stop()
+  }
+
+  # Get pathway names. Make sure we do not pull pathway names multiple times since its slow
+  pathways <-
+    kegg_dat %>%
+    dplyr::distinct(pathway) %>%
+    dplyr::rowwise() %>%
+    dplyr::mutate(
+      kegg_name = keggGet(pathway)[[1]]$NAME
+    )
+
+  kegg_dat %>%
+    dplyr::left_join(pathways, by = "pathway") %>%
+    dplyr::rename(kegg_pathway = pathway)
+}

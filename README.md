@@ -193,7 +193,9 @@ devtools::install_github("paulklemm/mygo")
 ## History
 
 - *2022-09-30*
-  - Add `run_kegg` option to `run_goterms`. Bump to 0.1.3
+  - Add `run_kegg` option to `run_goterms`
+  - Add `get_kegg_table` function
+  - Bump to 0.1.4
 - *2022-09-09*
   - Add `run_goterms` for usage in scripts
 - *2022-02-10*
