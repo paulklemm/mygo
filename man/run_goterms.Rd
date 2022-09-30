@@ -10,7 +10,9 @@ run_goterms(
   significance_cutoff = 0.05,
   use_background = FALSE,
   simplify = TRUE,
-  simplify_cutoff = 0.7
+  simplify_cutoff = 0.7,
+  run_kegg = FALSE,
+  species = "MUS"
 )
 }
 \arguments{
@@ -23,6 +25,10 @@ run_goterms(
 \item{simplify}{Summarise GO-terms}
 
 \item{simplify_cutoff}{When summarising, use this cutoff}
+
+\item{run_kegg}{Run KEGG pathway analysis. Adds columns \code{kegg} and \code{kegg_dt}}
+
+\item{species}{Species string, either "MUS" or "HUM"}
 }
 \value{
 list containing plots and table outputs

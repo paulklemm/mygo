@@ -767,6 +767,8 @@ overlap_percentage_plot_facet_category <- function(
 #' @param use_background Use whole table as gene background
 #' @param simplify Summarise GO-terms
 #' @param simplify_cutoff When summarising, use this cutoff
+#' @param run_kegg Run KEGG pathway analysis. Adds columns `kegg` and `kegg_dt`
+#' @param species Species string, either "MUS" or "HUM"
 #' @return list containing plots and table outputs
 #' @export
 run_goterms <- function(
@@ -774,14 +776,27 @@ run_goterms <- function(
   significance_cutoff = .05,
   use_background = FALSE,
   simplify = TRUE,
-  simplify_cutoff = .7
+  simplify_cutoff = .7,
+  run_kegg = FALSE,
+  species = "MUS"
 ) {
   # Get memoised versions to speed up repeated analyses
   get_go_all_ontologies <- rmyknife::get_memoised(mygo::get_go_all_ontologies)
   simplify_ontologies <- rmyknife::get_memoised(mygo::simplify_ontologies)
+  enrichKEGG <- rmyknife::get_memoised(clusterProfiler::enrichKEGG)
+
+  # Check species
+  if (species == "MUS") {
+    species_kegg <- "mmu"
+  } else if (species_kegg == "HUM") {
+    species_kegg <- "hsa"
+  } else {
+    stop("Species must be either 'MUS' or 'HUM'")
+  }
 
   result <- list()
-  result$goterms <-
+
+  dat_entrez <-
     dat %>%
     dplyr::rename(q_value = padj) %>%
     rmyknife::ensembl_to_entrez(
@@ -789,17 +804,23 @@ run_goterms <- function(
       keep_only_rows_with_entrez = TRUE,
       drop_duplicates = TRUE
     ) %>%
-    rmyknife::attach_gene_symbol_from_entrez() %>%
+    rmyknife::attach_gene_symbol_from_entrez()
+
+  result$goterms <-
+    dat_entrez %>%
     get_go_all_ontologies(
       use_background = use_background,
-      significance_cutoff = significance_cutoff
+      significance_cutoff = significance_cutoff,
+      species = species
     )
+  
   # Optionally simplify the ontologies
   if (simplify) {
     result$goterms <-
       result$goterms %>%
       simplify_ontologies(cutoff = simplify_cutoff)
   }
+
   # Are the goterms valid?
   valid_goterms <- (result$goterms %>% length() > 0)
   if (!valid_goterms) {
@@ -830,6 +851,22 @@ run_goterms <- function(
         order_by = "significance",
         n = 20
       )
+  }
+
+  # Run KEGG pathway analysis
+  if (run_kegg) {
+    # Get Kegg Pathways
+    result$kegg <-
+      enrichKEGG(
+        gene = dat_entrez$EntrezID,
+        organism = species_kegg,
+        pvalueCutoff = significance_cutoff
+      )
+
+    result$kegg_dt <-
+      result$kegg %>%
+      tibble::as_tibble() %>%
+      rmyknife::dt_datatable(caption = "KEGG Pathways")
   }
   
   # Operations related to log2FoldChange
