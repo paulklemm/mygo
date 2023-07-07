@@ -227,13 +227,15 @@ volcano_plot <- function(dat, label_top_n = 20) {
 #' Get GO-terms for all ontologies
 #'
 #' @export
-#' @param dat Data frame containing columns `pValue` and `EntrezID`
+#' @param dat Data frame containing columns `q_value`, `EntrezID` and optionally `fc`
 #' @param significance_cutoff Cutoff to consider genes as significant
+#' @param fc_cutoff Fold change cutoff to consider genes as significant
 #' @param use_background Use gene list as background instead of using all genes as background
 #' @param species Either "HUM" or "MUS"
 get_go_all_ontologies <- function(
   dat,
   significance_cutoff = 0.05,
+  fc_cutoff = 0,
   use_background = TRUE,
   species = "MUS"
 ) {
@@ -246,8 +248,17 @@ get_go_all_ontologies <- function(
   # Get all genes in the data set as background universe
   background_entrezgenes <- valid_dat %>%
     .$EntrezID
+  
   # Get significant genes
-  significant_entrezgenes <- valid_dat %>%
+  valid_dat_filtered <- valid_dat
+  # Filter by foldchange if required
+  if (fc_cutoff != 0) {
+    valid_dat_filtered <-
+      valid_dat_filtered %>%
+      dplyr::filter(fc >= fc_cutoff | fc <= -fc_cutoff)
+  }
+  significant_entrezgenes <-
+    valid_dat_filtered %>%
     dplyr::filter(q_value <= significance_cutoff) %>%
     .$EntrezID
   
@@ -764,6 +775,7 @@ overlap_percentage_plot_facet_category <- function(
 #' This is for usage in custom analysis scripts
 #' @param dat Table containing `ensembl_gene_id`, `padj` and optionally `log2FoldChange`
 #' @param significance_cutoff Adjusted p-value cutoff
+#' @param fc_cutoff Fold change cutoff
 #' @param use_background Use whole table as gene background
 #' @param simplify Summarise GO-terms
 #' @param simplify_cutoff When summarising, use this cutoff
@@ -774,6 +786,7 @@ overlap_percentage_plot_facet_category <- function(
 run_goterms <- function(
   dat,
   significance_cutoff = .05,
+  fc_cutoff = 0,
   use_background = FALSE,
   simplify = TRUE,
   simplify_cutoff = .7,
@@ -796,8 +809,18 @@ run_goterms <- function(
 
   result <- list()
 
+  # Operations related to log2FoldChange
+  has_log2fc <- !is.null(dat$log2FoldChange)
+  dat_temp <- dat
+  # Rename log2FoldChange to fc if present
+  if (has_log2fc) {
+    dat_temp <-
+      dat_temp %>%
+      dplyr::rename(fc = log2FoldChange)
+  }
+
   dat_entrez <-
-    dat %>%
+    dat_temp %>%
     dplyr::rename(q_value = padj) %>%
     rmyknife::ensembl_to_entrez(
       ensembl_id_name = "ensembl_gene_id",
@@ -811,6 +834,7 @@ run_goterms <- function(
     get_go_all_ontologies(
       use_background = use_background,
       significance_cutoff = significance_cutoff,
+      fc_cutoff = fc_cutoff,
       species = species
     )
   
@@ -869,8 +893,6 @@ run_goterms <- function(
       rmyknife::dt_datatable(caption = "KEGG Pathways")
   }
   
-  # Operations related to log2FoldChange
-  has_log2fc <- !is.null(dat$log2FoldChange)
   if (has_log2fc & valid_goterms) {
     result$volcano <-
       dat %>%

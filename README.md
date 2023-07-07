@@ -192,6 +192,9 @@ devtools::install_github("paulklemm/mygo")
 
 ## History
 
+- *2023-07-07*
+  - Add `log2FoldChange` filter to `run_goterms` and `get_go_all_ontologies`
+  - Bump to 0.1.5
 - *2022-09-30*
   - Add `run_kegg` option to `run_goterms`
   - Add `get_kegg_table` function

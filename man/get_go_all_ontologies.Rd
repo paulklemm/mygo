@@ -7,14 +7,17 @@
 get_go_all_ontologies(
   dat,
   significance_cutoff = 0.05,
+  fc_cutoff = 0,
   use_background = TRUE,
   species = "MUS"
 )
 }
 \arguments{
-\item{dat}{Data frame containing columns \code{pValue} and \code{EntrezID}}
+\item{dat}{Data frame containing columns \code{q_value}, \code{EntrezID} and optionally \code{fc}}
 
 \item{significance_cutoff}{Cutoff to consider genes as significant}
+
+\item{fc_cutoff}{Fold change cutoff to consider genes as significant}
 
 \item{use_background}{Use gene list as background instead of using all genes as background}
 

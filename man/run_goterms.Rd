@@ -8,6 +8,7 @@ This is for usage in custom analysis scripts}
 run_goterms(
   dat,
   significance_cutoff = 0.05,
+  fc_cutoff = 0,
   use_background = FALSE,
   simplify = TRUE,
   simplify_cutoff = 0.7,
@@ -19,6 +20,8 @@ run_goterms(
 \item{dat}{Table containing \code{ensembl_gene_id}, \code{padj} and optionally \code{log2FoldChange}}
 
 \item{significance_cutoff}{Adjusted p-value cutoff}
+
+\item{fc_cutoff}{Fold change cutoff}
 
 \item{use_background}{Use whole table as gene background}
 
