@@ -192,6 +192,9 @@ devtools::install_github("paulklemm/mygo")
 
 ## History
 
+- *2025-03-07*
+  - Fix error in `plot_kegg`
+  - Bump to 0.1.6
 - *2023-07-07*
   - Add `log2FoldChange` filter to `run_goterms` and `get_go_all_ontologies`
   - Bump to 0.1.5

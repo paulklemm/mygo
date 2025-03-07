@@ -668,11 +668,11 @@ plot_kegg <- function(
   species = "mmu"
 ) {
   # Create a named vector containing foldchanges and Entrez IDs
-  fc_symbol_entrez <- dat %>%
-    dplyr::filter(!is.na(EntrezID)) %>%
-    .$log2FoldChange %>%
-    as.double() %>%
-    `names<-`(dat %>% .$EntrezID)
+  filtered_dat <- dat %>% dplyr::filter(!is.na(EntrezID))
+  fc_symbol_entrez <- filtered_dat$log2FoldChange %>%
+    as.double() %>% 
+    `names<-`(filtered_dat$EntrezID)
+
   # https://yulab-smu.top/clusterProfiler-book/chapter12.html
   kegg_pathway <- pathview::pathview(
     gene.data  = fc_symbol_entrez,
