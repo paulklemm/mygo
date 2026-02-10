@@ -242,7 +242,6 @@ get_go_all_ontologies <- function(
   # Prepare data frame
   valid_dat <- dat %>%
     dplyr::filter(!is.na(EntrezID)) %>%
-    #dplyr::mutate(EntrezID = as.numeric(EntrezID))
     dplyr::mutate(EntrezID = as.character(EntrezID))
 
   # Get all genes in the data set as background universe
@@ -251,16 +250,31 @@ get_go_all_ontologies <- function(
   
   # Get significant genes
   valid_dat_filtered <- valid_dat
+  
   # Filter by foldchange if required
   if (fc_cutoff != 0) {
+    if (!"fc" %in% names(valid_dat_filtered)) {
+      stop("fc_cutoff is set, but 'fc' column is missing from input data.")
+    }
     valid_dat_filtered <-
       valid_dat_filtered %>%
       dplyr::filter(fc >= fc_cutoff | fc <= -fc_cutoff)
   }
+  
   significant_entrezgenes <-
     valid_dat_filtered %>%
     dplyr::filter(q_value <= significance_cutoff) %>%
     .$EntrezID
+  
+  # Return early if no significant genes found to avoid clusterProfiler warnings/errors
+  if (length(significant_entrezgenes) == 0) {
+    warning("No significant genes found matching criteria (q_value/fc). Returning empty list.")
+    return(list(
+      Biological_Process = NULL,
+      Molecular_Function = NULL,
+      Cellular_Components = NULL
+    ))
+  }
   
   get_go_all_ontologies_helper(
     significant_entrezgenes,

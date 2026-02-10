@@ -192,6 +192,9 @@ devtools::install_github("paulklemm/mygo")
 
 ## History
 
+- *2026-02-10*
+  - Revise `get_go_all_ontologies` to be more type-safe
+  - Bump to 0.1.7
 - *2025-03-07*
   - Fix error in `plot_kegg`
   - Bump to 0.1.6
