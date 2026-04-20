@@ -4,10 +4,12 @@
 \alias{get_kegg}
 \title{Get KEGG GSE terms}
 \usage{
-get_kegg(dat)
+get_kegg(dat, species = "MUS")
 }
 \arguments{
 \item{dat}{Data frame containing columns \code{pValue} and \code{EntrezID}}
+
+\item{species}{Either "HUM" or "MUS"}
 }
 \description{
 Get KEGG GSE terms

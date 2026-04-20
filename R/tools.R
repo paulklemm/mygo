@@ -55,7 +55,7 @@ createHTMLReport <- function(
     clean = TRUE
   )
   # Now remove the intermediate knitting directory
-  file.remove(temp_knitting_path)
+  unlink(temp_knitting_path, recursive = TRUE)
 }
 
 #' Create clusterProfiler EMA plot from go term
@@ -162,7 +162,7 @@ plot_terms_gse <- function(gse_terms, fc_symbol) {
 simplify_ontologies <- function(ontologies, cutoff) {
   ontologies %>%
   purrr::map(function(.x) {
-    # Print GO ontology plots
+    if (is.null(.x)) return(NULL)
     .x %>% clusterProfiler::simplify(cutoff = cutoff)
   }) %>%
     return()
@@ -374,6 +374,7 @@ get_go_all_ontologies_helper <- function(
 plot_all_ontologies <- function(ontologies, fc_symbol) {
   ontologies %>%
   purrr::iwalk(function(.x, .y) {
+    if (is.null(.x)) return()
     # Print GO ontology
     .y %>% print()
     # Print GO ontology plots
@@ -397,13 +398,12 @@ attach_goterm_genecount <- function(
   # Check if we have a populated dataframe
   if (dat_tibble %>% nrow() > 0) {
     dat_tibble %>%
-      dplyr::rowwise() %>%
-      tidyr::separate(GeneRatio, remove = FALSE, into = c("temp", "TotalCount")) %>%
+      tidyr::separate_wider_delim(GeneRatio, delim = "/", names = c("temp", "TotalCount"), cols_remove = FALSE) %>%
       # Remove temporary variable
       dplyr::select(-temp) %>%
-      tidyr::separate(BgRatio, remove = FALSE, into = c("GOTermGeneCount", "BackgroundCount")) %>%
+      tidyr::separate_wider_delim(BgRatio, delim = "/", names = c("GOTermGeneCount", "BackgroundCount"), cols_remove = FALSE) %>%
       # Convert variables to numeric
-      dplyr::mutate_at(c("TotalCount", "GOTermGeneCount", "BackgroundCount"), as.numeric) %>%
+      dplyr::mutate(dplyr::across(c(TotalCount, GOTermGeneCount, BackgroundCount), as.numeric)) %>%
       dplyr::mutate(
         # Do not calculate GO-term size from all genes, but rather from the background
         # GOTermGeneCount = rmyknife::get_genes_of_goterm_godb(ID, species = species, verbose = FALSE) %>% length(),
@@ -465,7 +465,7 @@ export_go_terms_to_excel <- function(
 get_named_fc_vector <- function(dat) {
   # https://bioconductor.org/packages/release/bioc/vignettes/clusterProfiler/inst/doc/clusterProfiler.html#go-gene-set-enrichment-analysis
   fc <- dat %>% .$fc %>% as.double() %>% `names<-`(dat$EntrezID)
-  fc <- fc[!is.infinite(fc)]
+  fc <- fc[!is.infinite(fc) & !is.na(fc)]
   fc <- fc %>% sort(decreasing = TRUE)
   fc %>% return()
 }
@@ -478,12 +478,14 @@ get_named_fc_vector <- function(dat) {
 #' @param set_readable Replace EntrezIDs by readable gene names. This causes problems with ridgeplot
 #' @param simplify Simplify terms
 #' @param simplify_cutoff cutoff value of clusterProfiler::simplify()
+#' @param species Either "HUM" or "MUS"
 get_gse_all_ontologies <- function(
   dat,
   p_cutoff = 0.05,
   set_readable = TRUE,
   simplify = FALSE,
-  simplify_cutoff = 0.7
+  simplify_cutoff = 0.7,
+  species = "MUS"
 ) {
   # Prepare input data as required by GSE
   fc <- dat %>% get_named_fc_vector()
@@ -493,19 +495,22 @@ get_gse_all_ontologies <- function(
     ontology = "BP",
     fc = fc,
     p_cutoff = p_cutoff,
-    set_readable = set_readable
+    set_readable = set_readable,
+    species = species
   )
   gse_terms$Molecular_Function <- perform_gseGO(
     ontology = "MF",
     fc = fc,
     p_cutoff = p_cutoff,
-    set_readable = set_readable
+    set_readable = set_readable,
+    species = species
   )
   gse_terms$Cellular_Components <- perform_gseGO(
     ontology = "CC",
     fc = fc,
     p_cutoff = p_cutoff,
-    set_readable = set_readable
+    set_readable = set_readable,
+    species = species
   )
   # Simplify if required
   if (simplify) {
@@ -522,11 +527,12 @@ get_gse_all_ontologies <- function(
 #'
 #' @export
 #' @param dat Data frame containing columns `pValue` and `EntrezID`
-get_kegg <- function(dat) {
+#' @param species Either "HUM" or "MUS"
+get_kegg <- function(dat, species = "MUS") {
   # Prepare input data as required by GSE
   fc <- dat %>% get_named_fc_vector()
   kegg_terms <- list()
-  kegg_terms$kegg <- perform_gseKEGG(fc = fc)
+  kegg_terms$kegg <- perform_gseKEGG(fc = fc, species = species)
   kegg_terms %>% return()
 }
 
@@ -537,10 +543,18 @@ get_kegg <- function(dat) {
 #' @param fc Named vector of foldchanges (name denotes Entrez ID)
 #' @param p_cutoff P-value cutoff for GSEA
 #' @param set_readable Replace EntrezIDs by readable gene names. This causes problems with ridgeplot
-perform_gseGO <- function(ontology, fc, p_cutoff = 0.05, set_readable = TRUE) {
+#' @param species Either "HUM" or "MUS"
+perform_gseGO <- function(ontology, fc, p_cutoff = 0.05, set_readable = TRUE, species = "MUS") {
+  if (species == "MUS") {
+    org_db <- org.Mm.eg.db::org.Mm.eg.db
+  } else if (species == "HUM") {
+    org_db <- org.Hs.eg.db::org.Hs.eg.db
+  } else {
+    stop(paste0("Unknown species: ", species))
+  }
   gse <- clusterProfiler::gseGO(
     geneList = fc,
-    OrgDb = org.Mm.eg.db,
+    OrgDb = org_db,
     ont = ontology,
     pvalueCutoff = p_cutoff,
     verbose = FALSE
@@ -548,7 +562,7 @@ perform_gseGO <- function(ontology, fc, p_cutoff = 0.05, set_readable = TRUE) {
   if (set_readable) {
     gse <-
       gse %>%
-      DOSE::setReadable(OrgDb = org.Mm.eg.db)
+      DOSE::setReadable(OrgDb = org_db)
   }
   return(gse)
 }
@@ -557,8 +571,10 @@ perform_gseGO <- function(ontology, fc, p_cutoff = 0.05, set_readable = TRUE) {
 #'
 #' @export
 #' @param fc Named vector of foldchanges (name denotes Entrez ID)
-perform_gseKEGG <- function(fc) {
-  fc %>% clusterProfiler::gseKEGG(organism = "mmu") %>%
+#' @param species Either "HUM" or "MUS"
+perform_gseKEGG <- function(fc, species = "MUS") {
+  organism <- switch(species, MUS = "mmu", HUM = "hsa", stop(paste0("Unknown species: ", species)))
+  fc %>% clusterProfiler::gseKEGG(organism = organism) %>%
     return()
 }
 
@@ -745,12 +761,13 @@ bind_goterm_table <- function(dat) {
 #' @return ggplot2 plot
 #' @export
 emap_plot_facet_category <- function(dat, n = 50) {
-  dat$Biological_Process %>%
-    mygo::emap_plot("Enrich Map Biological Process", n) +
-    dat$Cellular_Components %>%
-    mygo::emap_plot("Enrich Map Cellular Component", n) +
-    dat$Molecular_Function %>%
-    mygo::emap_plot("Enrich Map Molecular Function", n)
+  plots <- list(
+    dat$Biological_Process %>% mygo::emap_plot("Enrich Map Biological Process", n),
+    dat$Cellular_Components %>% mygo::emap_plot("Enrich Map Cellular Component", n),
+    dat$Molecular_Function %>% mygo::emap_plot("Enrich Map Molecular Function", n)
+  ) %>% Filter(Negate(is.null), .)
+  if (length(plots) == 0) return(NULL)
+  Reduce(`+`, plots)
 }
 
 #' Wrapper for mygo::overlap_percentage_plot to facet all GO categories
@@ -815,7 +832,7 @@ run_goterms <- function(
   # Check species
   if (species == "MUS") {
     species_kegg <- "mmu"
-  } else if (species_kegg == "HUM") {
+  } else if (species == "HUM") {
     species_kegg <- "hsa"
   } else {
     stop("Species must be either 'MUS' or 'HUM'")
@@ -860,7 +877,7 @@ run_goterms <- function(
   }
 
   # Are the goterms valid?
-  valid_goterms <- (result$goterms %>% length() > 0)
+  valid_goterms <- !all(purrr::map_lgl(result$goterms, is.null))
   if (!valid_goterms) {
     warning("We found no GO-terms.")
   }
@@ -877,11 +894,13 @@ run_goterms <- function(
     result$goterms$Molecular_Function %>%
     mygo::emap_plot("Enrich Map Molecular Function")
   
-  result$dt <-
-    result$goterms %>%
-    mygo::bind_goterm_table() %>%
-    rmyknife::dt_datatable()
-  
+  if (valid_goterms) {
+    result$dt <-
+      result$goterms %>%
+      mygo::bind_goterm_table() %>%
+      rmyknife::dt_datatable()
+  }
+
   if (valid_goterms) {
     result$plot_percentage <-
       result$goterms %>%
@@ -923,8 +942,9 @@ run_goterms <- function(
       dplyr::rename(external_gene_name = geneID) %>%
       tidyr::separate_rows(external_gene_name, sep = "/") %>%
       dplyr::left_join(
-        dat %>%
-          dplyr::select(ensembl_gene_id, external_gene_name, padj, log2FoldChange),
+        dat_entrez %>%
+          dplyr::select(ensembl_gene_id, external_gene_name, q_value, fc) %>%
+          dplyr::rename(padj = q_value, log2FoldChange = fc),
         by = "external_gene_name"
       ) %>%
       dplyr::group_by(ID) %>%

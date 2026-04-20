@@ -4,10 +4,12 @@
 \alias{perform_gseKEGG}
 \title{Perform a clusterProfiler gseKEGG analysis}
 \usage{
-perform_gseKEGG(fc)
+perform_gseKEGG(fc, species = "MUS")
 }
 \arguments{
 \item{fc}{Named vector of foldchanges (name denotes Entrez ID)}
+
+\item{species}{Either "HUM" or "MUS"}
 }
 \description{
 Perform a clusterProfiler gseKEGG analysis

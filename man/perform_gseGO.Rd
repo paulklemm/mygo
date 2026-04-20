@@ -4,7 +4,13 @@
 \alias{perform_gseGO}
 \title{Perform a clusterProfiler gseGO analysis}
 \usage{
-perform_gseGO(ontology, fc, p_cutoff = 0.05, set_readable = TRUE)
+perform_gseGO(
+  ontology,
+  fc,
+  p_cutoff = 0.05,
+  set_readable = TRUE,
+  species = "MUS"
+)
 }
 \arguments{
 \item{ontology}{Can be either "BP", "CC", "MF"}
@@ -14,6 +20,8 @@ perform_gseGO(ontology, fc, p_cutoff = 0.05, set_readable = TRUE)
 \item{p_cutoff}{P-value cutoff for GSEA}
 
 \item{set_readable}{Replace EntrezIDs by readable gene names. This causes problems with ridgeplot}
+
+\item{species}{Either "HUM" or "MUS"}
 }
 \description{
 Perform a clusterProfiler gseGO analysis

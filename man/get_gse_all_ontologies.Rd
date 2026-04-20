@@ -9,7 +9,8 @@ get_gse_all_ontologies(
   p_cutoff = 0.05,
   set_readable = TRUE,
   simplify = FALSE,
-  simplify_cutoff = 0.7
+  simplify_cutoff = 0.7,
+  species = "MUS"
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ get_gse_all_ontologies(
 \item{simplify}{Simplify terms}
 
 \item{simplify_cutoff}{cutoff value of clusterProfiler::simplify()}
+
+\item{species}{Either "HUM" or "MUS"}
 }
 \description{
 Get GSE-terms for all ontologies

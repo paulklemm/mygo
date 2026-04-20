@@ -192,6 +192,9 @@ devtools::install_github("paulklemm/mygo")
 
 ## History
 
+- *2026-04-20*
+  - Apply code-review
+  - Bump to 0.1.8
 - *2026-02-10*
   - Revise `get_go_all_ontologies` to be more type-safe
   - Bump to 0.1.7
